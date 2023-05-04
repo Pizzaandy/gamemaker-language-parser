@@ -41,9 +41,9 @@ ifStatement
     ;
     
 iterationStatement
-    : Do statement Until expression eos # DoStatement
+    : Do statement Until expression eos? # DoStatement
     | While expression statement # WhileStatement
-    | For '(' (varDeclarationSequence | assignmentStatement)? ';' expression? ';' statement? ')' statement   # ForStatement
+    | For '(' (varDeclarationSequence | varDeclaration)? ';' expression? ';' statement? ')' statement   # ForStatement
     | Repeat expression statement # RepeatStatement
     ;
     
@@ -56,15 +56,15 @@ switchStatement
     ;
     
 continueStatement
-    : Continue eos
+    : Continue eos?
     ;
 
 breakStatement
-    : Break eos
+    : Break eos?
     ;
     
 exitStatement
-    : Exit eos
+    : Exit eos?
     ;
     
 emptyStatement
@@ -88,11 +88,15 @@ defaultClause
     ;
     
 returnStatement
-    : Return expression? eos
+    : Return expression? eos?
+    ;
+
+deleteStatement
+    : Delete expression eos?
     ;
     
 varDeclarationSequence
-    : varModifier varDeclaration (',' varDeclaration)* eos
+    : varModifier varDeclaration (',' varDeclaration)* eos?
     ;
     
 varModifier
@@ -104,19 +108,15 @@ varDeclaration
     : identifier (Assign expression)?
     ;
     
-expressionStatement
-    : expression eos
-    ;
-    
 assignmentStatement
-    : assignableExpression assignmentOperator expression
+    : leftValueExpression assignmentOperator expression eos?
     ;
 
-assignableExpression
-    : assignableExpression '[' accessorPrefix? expressionSequence ']' # MemberIndexAssignable
-    | assignableExpression '.' identifier # MemberDotAssignable
-    | identifier # IdentifierAssignable
-    | '(' assignableExpression ')' # ParenthesizedAssignable
+leftValueExpression
+    : leftValueExpression '[' accessorPrefix? expressionSequence ']' # MemberIndexLeftExpression
+    | leftValueExpression '.' identifier # MemberDotLeftExpression
+    | identifier # IdentifierLeftExpression
+    | '(' leftValueExpression ')' # ParenthesizedLeftExpression
     ;
 
 expressionSequence
@@ -128,13 +128,8 @@ expression
     | expression '[' accessorPrefix? expressionSequence ']' # MemberIndexExpression
     | expression '.' identifier # MemberDotExpression
     | New identifier arguments # NewExpression
-    | Delete expression # DeleteExpression
+    | sideEffectExpression # StatementExpression
 
-    | assignableExpression '++' # PostIncrementExpression
-    | assignableExpression '--' # PostDecreaseExpression
-    | expression arguments # ArgumentsExpression
-    | '++' assignableExpression # PreIncrementExpression
-    | '--' assignableExpression # PreDecreaseExpression
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
     | Not expression # NotExpression
@@ -159,6 +154,18 @@ expression
     | identifier # IdentifierExpression
     | literal # LiteralExpression
     | '(' expression ')' # ParenthesizedExpression
+    ;
+
+expressionStatement
+    : sideEffectExpression eos?
+    ;
+
+sideEffectExpression
+    : leftValueExpression arguments # CallExpression
+    | leftValueExpression '++' # PostIncrementExpression
+    | leftValueExpression '--' # PostDecreaseExpression
+    | '++' leftValueExpression # PreIncrementExpression
+    | '--' leftValueExpression # PreDecreaseExpression
     ;
 
 anonymousFunction
@@ -308,7 +315,5 @@ propertySoftKeyword
 
 eos
     : SemiColon
-    | {this.lineTerminatorAhead()}?
-    | {this.closeBrace()}?
     ;
     

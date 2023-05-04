@@ -2,7 +2,7 @@ import antlr4 from 'antlr4';
 import GameMakerLanguageLexer from './GameMakerLanguageLexer.js';
 import GameMakerLanguageParser from './GameMakerLanguageParser.js';
 
-const input = '{}';
+const input = 'function xyz(z = foo.bar) return false #macro abc !&*93842';
 const chars = new antlr4.InputStream(input);
 const lexer = new GameMakerLanguageLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
