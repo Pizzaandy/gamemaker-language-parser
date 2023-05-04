@@ -103,10 +103,10 @@ Try:                            'try';
 Enum:                           'enum';
 Constructor:                    'constructor';
 Static:                         'static';
-Macro:                          '#macro' -> pushMode(PREPROCESSOR_IDENTIFIER);
-Define:                         '#define' -> pushMode(PREPROCESSOR_IDENTIFIER);
-Region:                         '#region' -> pushMode(PREPROCESSOR_BODY);
-EndRegion:                      '#endregion' -> pushMode(PREPROCESSOR_BODY);
+Macro:                          '#macro' -> mode(PREPROCESSOR_IDENTIFIER);
+Define:                         '#define' -> mode(PREPROCESSOR_IDENTIFIER);
+Region:                         '#region' -> mode(PREPROCESSOR_BODY);
+EndRegion:                      '#endregion' -> mode(PREPROCESSOR_BODY);
 
 /// Identifier Names and Identifiers
 
@@ -175,7 +175,7 @@ fragment DecimalIntegerLiteral
 mode PREPROCESSOR_IDENTIFIER;
 
 PpIdentifier
-    : IdentifierStart IdentifierPart* -> pushMode(PREPROCESSOR_BODY)
+    : IdentifierStart IdentifierPart* -> mode(PREPROCESSOR_BODY)
     ;
     
 PpWhiteSpaces
@@ -195,7 +195,7 @@ PpNewLineEscaped
     ;
     
 PpEnd
-    : PpNewLine -> popMode, popMode
+    : (PpNewLine) -> mode(DEFAULT_MODE)
     ;
     
 fragment PpNewLine
