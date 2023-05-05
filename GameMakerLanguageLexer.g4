@@ -83,6 +83,7 @@ Case:                           'case';
 Else:                           'else';
 New:                            'new';
 Var:                            'var';
+GlobalVar:                      'globalvar';
 Catch:                          'catch';
 Finally:                        'finally';
 Return:                         'return';

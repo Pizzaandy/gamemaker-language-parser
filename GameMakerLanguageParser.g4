@@ -16,6 +16,7 @@ statement
     | macroStatement
     | iterationStatement
     | variableDeclarationList
+    | globalVarStatement
     | assignmentStatement
     | singleExpressionStatement
     | ifStatement
@@ -119,6 +120,10 @@ varModifier
     
 variableDeclaration
     : identifier (Assign expression)?
+    ;
+
+globalVarStatement
+    : GlobalVar identifier SemiColon
     ;
 
 lValueExpression
