@@ -34,7 +34,7 @@ statement
     ;
     
 block
-    : OpenBrace statementList? CloseBrace
+    : openBlock statementList? closeBlock
     ;
     
 ifStatement
@@ -73,7 +73,7 @@ emptyStatement
     ;
     
 caseBlock
-    : OpenBrace caseClauses? (defaultClause caseClauses?)? CloseBrace
+    : openBlock caseClauses? (defaultClause caseClauses?)? closeBlock
     ;
 
 caseClauses
@@ -227,7 +227,7 @@ literal
     | arrayLiteral
     | structLiteral
     ;
-    
+
 arrayLiteral
     : '[' elementList ']'
     ;
@@ -237,7 +237,7 @@ elementList
     ;
     
 structLiteral
-    : OpenBrace (propertyAssignment (',' propertyAssignment)* ','?)? CloseBrace
+    : openBlock (propertyAssignment (',' propertyAssignment)* ','?)? closeBlock
     ;
     
 functionDeclaration
@@ -269,7 +269,7 @@ identifier
     ;
     
 enumeratorDeclaration
-    : Enum identifier OpenBrace enumeratorList? CloseBrace
+    : Enum identifier openBlock enumeratorList? closeBlock
     ;
     
 enumeratorList
@@ -326,6 +326,14 @@ softKeyword
 
 propertySoftKeyword
     : NoOneLiteral
+    ;
+
+openBlock
+    : OpenBrace | Begin
+    ;
+
+closeBlock
+    : CloseBrace | End
     ;
 
 eos

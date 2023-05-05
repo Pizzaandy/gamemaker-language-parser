@@ -9,8 +9,10 @@ OpenBracket:                    '[';
 CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
-OpenBrace:                      '{' | 'begin';
-CloseBrace:                     '}' | 'end';
+OpenBrace:                      '{';
+CloseBrace:                     '}';
+Begin:                          'begin';
+End:                            'end';
 SemiColon:                      ';';
 Comma:                          ',';
 Assign:                         '=' | ':=';
@@ -129,6 +131,8 @@ fragment IdentifierPart
 
 StringLiteral: '"' StringCharacter* '"';
 
+TemplateStringLiteral: '$"' StringCharacter* '"';
+
 VerbatimStringLiteral
     : '@"' (~'"' | '""')* '"'
     | '@\'' (~'\'' | '\'\'')* '\''
@@ -171,7 +175,6 @@ fragment DecimalIntegerLiteral
     : '0'
     | [1-9] [0-9_]*
     ;
-
 
 mode PREPROCESSOR_IDENTIFIER;
 

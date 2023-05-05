@@ -1,10 +1,12 @@
-#region cursed! .,'[]-=_+)(*&^%$@ // # macro
+#region cursed #macro #region #define
+
+globalvar a, constructor;
 
 a=0xFG=1 var var var i := 0
 do begin
 ;;;;show_debug_message(i)
-;;;;++i
-end until not i < 10
+;;;;++constructor
+end until not constructor < 10
 
 for (var i:=-1; ++i<>10; { var j=-1; while ++j<10 begin
 	array[i, j] = 0;
