@@ -187,11 +187,11 @@ mode PREPROCESSOR_BODY;
 
 // exclude: whitespace, newlines, \, #
 PpBodyCharacters
-    : ~[\r\n\u2028\u2029\\#]+
+    : ~[\r\n\u2028\u2029\\]+
     ;
 
 PpNewLineEscaped
-    : '\\' PpNewLine+
+    : '\\' (PpBodyCharacters+)? PpNewLine+
     ;
     
 PpEnd

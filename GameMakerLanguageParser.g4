@@ -15,9 +15,9 @@ statement
     | emptyStatement
     | macroStatement
     | iterationStatement
-    | varDeclarationSequence
+    | variableDeclarationList
     | assignmentStatement
-    | expressionStatement
+    | singleExpressionStatement
     | ifStatement
     | returnStatement
     | withStatement
@@ -43,7 +43,7 @@ ifStatement
 iterationStatement
     : Do statement Until expression eos? # DoStatement
     | While expression statement # WhileStatement
-    | For '(' (varDeclarationSequence | varDeclaration)? ';' expression? ';' statement? ')' statement   # ForStatement
+    | For '(' assignment? ';' expression? ';' statement? ')' statement   # ForStatement
     | Repeat expression statement # RepeatStatement
     ;
     
@@ -94,9 +94,22 @@ returnStatement
 deleteStatement
     : Delete expression eos?
     ;
-    
-varDeclarationSequence
-    : varModifier varDeclaration (',' varDeclaration)* eos?
+
+assignmentStatement
+    : assignment eos?
+    ;
+
+assignment
+    : singleAssignment
+    | variableDeclarationList
+    ;
+
+singleAssignment
+    : lValueExpression assignmentOperator expression
+    ;
+
+variableDeclarationList
+    : varModifier variableDeclaration (',' variableDeclaration)*
     ;
     
 varModifier
@@ -104,19 +117,15 @@ varModifier
     | Static
     ;
     
-varDeclaration
+variableDeclaration
     : identifier (Assign expression)?
     ;
-    
-assignmentStatement
-    : leftValueExpression assignmentOperator expression eos?
-    ;
 
-leftValueExpression
-    : leftValueExpression '[' accessorPrefix? expressionSequence ']' # MemberIndexLeftExpression
-    | leftValueExpression '.' identifier # MemberDotLeftExpression
-    | identifier # IdentifierLeftExpression
-    | '(' leftValueExpression ')' # ParenthesizedLeftExpression
+lValueExpression
+    : lValueExpression '[' accessorQualifier? expressionSequence ']' # MemberIndexLValue
+    | lValueExpression '.' identifier # MemberDotLValue
+    | identifier # IdentifierLValue
+    | '(' lValueExpression ')' # ParenthesizedLValue
     ;
 
 expressionSequence
@@ -125,10 +134,11 @@ expressionSequence
 
 expression
     : anonymousFunction # FunctionExpression
-    | expression '[' accessorPrefix? expressionSequence ']' # MemberIndexExpression
+    | expression '[' accessorQualifier? expressionSequence ']' # MemberIndexExpression
     | expression '.' identifier # MemberDotExpression
     | New identifier arguments # NewExpression
-    | sideEffectExpression # StatementExpression
+
+    | expressionStatement # ExpressionStatementExpression
 
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
@@ -157,22 +167,22 @@ expression
     ;
 
 expressionStatement
-    : sideEffectExpression eos?
+    : lValueExpression arguments # CallExpression
+    | lValueExpression '++' # PostIncrementExpression
+    | lValueExpression '--' # PostDecreaseExpression
+    | '++' lValueExpression # PreIncrementExpression
+    | '--' lValueExpression # PreDecreaseExpression
     ;
 
-sideEffectExpression
-    : leftValueExpression arguments # CallExpression
-    | leftValueExpression '++' # PostIncrementExpression
-    | leftValueExpression '--' # PostDecreaseExpression
-    | '++' leftValueExpression # PreIncrementExpression
-    | '--' leftValueExpression # PreDecreaseExpression
+singleExpressionStatement
+    : expressionStatement eos?
     ;
 
 anonymousFunction
     : Function_ arguments statement
     ;
     
-accessorPrefix
+accessorQualifier
     : '#' | '@' | '$' | '?' | '|'
     ;
     
@@ -228,6 +238,10 @@ structLiteral
 functionDeclaration
     : Function_ identifier parameterList statement
     ;
+
+constructorDeclaration
+    : Function_ identifier? parameterList (':' identifier parameterList)? Constructor statement
+    ;
     
 parameterList
     : '(' (parameterArgument (',' parameterArgument)* ','?)? ')'
@@ -249,10 +263,6 @@ identifier
     : Identifier | softKeyword
     ;
     
-constructorDeclaration
-    : Function_ identifier? parameterList (':' identifier parameterList)? Constructor statement
-    ;
-    
 enumeratorDeclaration
     : Enum identifier OpenBrace enumeratorList? CloseBrace
     ;
@@ -269,7 +279,7 @@ macroStatement
     : Macro PpIdentifier macroBody PpEnd?
     ;
     
-// handle multi-line macros just in case
+// handles multi-line macros just in case
 macroBody
     : (PpBodyCharacters | PpNewLineEscaped)+
     ;
