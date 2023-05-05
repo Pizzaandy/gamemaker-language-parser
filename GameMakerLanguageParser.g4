@@ -123,7 +123,7 @@ variableDeclaration
     ;
 
 globalVarStatement
-    : GlobalVar identifier SemiColon
+    : GlobalVar identifier (',' identifier)* SemiColon
     ;
 
 lValueExpression
