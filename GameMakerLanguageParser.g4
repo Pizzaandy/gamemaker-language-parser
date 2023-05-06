@@ -140,7 +140,7 @@ expressionSequence
 expression
     : anonymousFunction # FunctionExpression
     | expression '[' accessorQualifier? expressionSequence ']' # MemberIndexExpression
-    | expression '.' identifier # MemberDotExpression
+    | expression '.' expression # MemberDotExpression
     | New identifier arguments # NewExpression
 
     | expressionStatement # ExpressionStatementExpression
@@ -220,6 +220,7 @@ literal
     | BooleanLiteral
     | StringLiteral
     | VerbatimStringLiteral
+    | TemplateStringLiteral
     | HexIntegerLiteral
     | BinaryLiteral
     | DecimalLiteral
