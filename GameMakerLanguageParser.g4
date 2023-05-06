@@ -25,6 +25,8 @@ statement
     | withStatement
     | continueStatement
     | switchStatement
+    | tryStatement
+    | throwStatement
     | breakStatement
     | exitStatement
     | constructorDeclaration
@@ -49,7 +51,7 @@ iterationStatement
         (variableDeclarationList | assignmentExpression)? ';' 
         expression? ';' 
         statement? 
-    ')' statement   # ForStatement
+    ')' statement # ForStatement
     | Repeat expression statement # RepeatStatement
     ;
     
@@ -91,6 +93,22 @@ caseClause
     
 defaultClause
     : Default ':' statementList?
+    ;
+
+throwStatement
+    : Throw expression eos?
+    ;
+
+tryStatement
+    : Try statement (catchProduction finallyProduction? | finallyProduction)
+    ;
+
+catchProduction
+    : Catch ('(' identifier? ')')? statement
+    ;
+
+finallyProduction
+    : Finally statement
     ;
     
 returnStatement
@@ -176,14 +194,14 @@ expression
     ;
     
 callStatement
-    : lValueExpression arguments eos? 
+    : expression arguments eos? 
     ;
 
 incDecStatement
-    : lValueExpression '++' # PostIncrementStatement
-    | lValueExpression '--' # PostDecreaseStatement
-    | '++' lValueExpression # PreIncrementStatement
-    | '--' lValueExpression # PreDecreaseStatement
+    : expression '++' eos? # PostIncrementStatement
+    | expression '--' eos? # PostDecreaseStatement
+    | '++' expression eos? # PreIncrementStatement
+    | '--' expression eos? # PreDecreaseStatement
     ;
 
 anonymousFunction

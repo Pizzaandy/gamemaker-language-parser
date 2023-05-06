@@ -194,7 +194,7 @@ PpBodyCharacters
     ;
 
 PpNewLineEscaped
-    : '\\' (PpBodyCharacters+)? PpNewLine+
+    : '\\' (PpBodyCharacters+)? PpNewLine
     ;
     
 PpEnd
