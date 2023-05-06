@@ -18,7 +18,8 @@ statement
     | variableDeclarationList
     | globalVarStatement
     | assignmentStatement
-    | singleExpressionStatement
+    | incDecStatement
+    | callStatement
     | ifStatement
     | returnStatement
     | withStatement
@@ -44,7 +45,11 @@ ifStatement
 iterationStatement
     : Do statement Until expression eos? # DoStatement
     | While expression statement # WhileStatement
-    | For '(' assignment? ';' expression? ';' statement? ')' statement   # ForStatement
+    | For '(' 
+        (variableDeclarationList | assignmentExpression)? ';' 
+        expression? ';' 
+        statement? 
+    ')' statement   # ForStatement
     | Repeat expression statement # RepeatStatement
     ;
     
@@ -97,15 +102,10 @@ deleteStatement
     ;
 
 assignmentStatement
-    : assignment eos?
+    : assignmentExpression eos?
     ;
 
-assignment
-    : singleAssignment
-    | variableDeclarationList
-    ;
-
-singleAssignment
+assignmentExpression
     : lValueExpression assignmentOperator expression
     ;
 
@@ -143,7 +143,11 @@ expression
     | expression '.' expression # MemberDotExpression
     | New identifier arguments # NewExpression
 
-    | expressionStatement # ExpressionStatementExpression
+    | expression arguments # CallExpression
+    | expression '++' # PostIncrementExpression
+    | expression '--' # PostDecreaseExpression
+    | '++' expression # PreIncrementExpression
+    | '--' expression # PreDecreaseExpression
 
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
@@ -170,17 +174,16 @@ expression
     | literal # LiteralExpression
     | '(' expression ')' # ParenthesizedExpression
     ;
-
-expressionStatement
-    : lValueExpression arguments # CallExpression
-    | lValueExpression '++' # PostIncrementExpression
-    | lValueExpression '--' # PostDecreaseExpression
-    | '++' lValueExpression # PreIncrementExpression
-    | '--' lValueExpression # PreDecreaseExpression
+    
+callStatement
+    : lValueExpression arguments eos? 
     ;
 
-singleExpressionStatement
-    : expressionStatement eos?
+incDecStatement
+    : lValueExpression '++' # PostIncrementStatement
+    | lValueExpression '--' # PostDecreaseStatement
+    | '++' lValueExpression # PreIncrementStatement
+    | '--' lValueExpression # PreDecreaseStatement
     ;
 
 anonymousFunction
