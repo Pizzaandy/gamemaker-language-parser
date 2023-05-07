@@ -88,7 +88,7 @@ caseClauses
     ;
     
 caseClause
-    : Case expressionSequence ':' statementList?
+    : Case expression ':' statementList?
     ;
     
 defaultClause

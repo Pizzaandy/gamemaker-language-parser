@@ -88,6 +88,9 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         }
         if (ctx.functionDeclaration() != null) {
             return this.visit(ctx.functionDeclaration());
+        }
+        if (ctx.switchStatement() != null) {
+            return this.visit(ctx.switchStatement());
         } 
 
         if (ctx.incDecStatement() != null) {
@@ -107,7 +110,13 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         }
         if (ctx.breakStatement() != null) {
             return this.visit(ctx.breakStatement());
-        }  
+        }
+        if (ctx.throwStatement() != null) {
+            return this.visit(ctx.throwStatement());
+        }
+        if (ctx.tryStatement() != null) {
+            return this.visit(ctx.tryStatement());
+        }
 
         if (ctx.globalVarStatement() != null) {
             return this.visit(ctx.globalVarStatement());
@@ -214,7 +223,11 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#switchStatement.
     visitSwitchStatement(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "SwitchStatement",
+            discriminant: this.visit(ctx.expression()),
+            cases: this.visit(ctx.caseBlock())
+        }
     }
 
 
@@ -250,7 +263,18 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#caseBlock.
     visitCaseBlock(ctx) {
-        return this.visitChildren(ctx);
+        let caseClauses = []
+        // yucky
+        if (ctx.caseClauses() != null) {
+            let cases = ctx.caseClauses();
+            for (let i = 0; i < cases.length; i++) {
+                caseClauses = caseClauses.concat(this.visit(cases[i]));
+            }
+        }
+        if (ctx.defaultClause() != null) {
+            caseClauses.push(this.visit(ctx.defaultClause()));
+        }
+        return caseClauses;
     }
 
 
@@ -262,13 +286,29 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#caseClause.
     visitCaseClause(ctx) {
-        return this.visitChildren(ctx);
+        let consequent = null;
+        if (ctx.statementList() != null) {
+            consequent = this.visit(ctx.statementList());
+        }
+        return {
+            type: "SwitchCase",
+            test: this.visit(ctx.expression()),
+            consequent: consequent
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#defaultClause.
     visitDefaultClause(ctx) {
-        return this.visitChildren(ctx);
+        let consequent = null;
+        if (ctx.statementList() != null) {
+            consequent = this.visit(ctx.statementList());
+        }
+        return {
+            type: "SwitchCase",
+            test: null,
+            consequent: consequent
+        };
     }
 
 
@@ -277,25 +317,49 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         return {
             type: "ThrowStatement",
             argument: this.visit(ctx.expression())
-        }
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#tryStatement.
     visitTryStatement(ctx) {
-        return this.visitChildren(ctx);
+        let handler = null;
+        let finalizer = null;
+        if (ctx.catchProduction() != null) {
+            handler = this.visit(ctx.catchProduction());
+        }
+        if (ctx.finallyProduction() != null) {
+            finalizer = this.visit(ctx.finallyProduction());
+        }
+        return {
+            type: "TryStatement",
+            block: this.visit(ctx.statement()),
+            handler: handler,
+            finalizer: finalizer
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#catchProduction.
     visitCatchProduction(ctx) {
-        return this.visitChildren(ctx);
+        let param = null;
+        if (ctx.identifier() != null) {
+            param = this.visit(ctx.identifier());
+        }
+        return {
+            type: "CatchClause",
+            param: param,
+            body: this.visit(ctx.statement())
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#finallyProduction.
     visitFinallyProduction(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "Finalizer",
+            body: this.visit(ctx.statement())
+        };
     }
 
 
@@ -565,7 +629,19 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#BitShiftExpression.
     visitBitShiftExpression(ctx) {
-        return this.visitChildren(ctx);
+        let operator = null; 
+        if (ctx.RightShiftArithmetic() != null) {
+            operator = ctx.RightShiftArithmetic().getText();
+        }
+        if (ctx.LeftShiftArithmetic() != null) {
+            operator = ctx.LeftShiftArithmetic().getText();
+        }
+        return {
+            type: "BinaryExpression",
+            operator: operator,
+            left: this.visit(ctx.expression()[0]),
+            right: this.visit(ctx.expression()[1])
+        }
     }
 
 
@@ -577,7 +653,19 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#AdditiveExpression.
     visitAdditiveExpression(ctx) {
-        return this.visitChildren(ctx);
+        let operator = null; 
+        if (ctx.Plus() != null) {
+            operator = ctx.Plus().getText();
+        }
+        if (ctx.Minus() != null) {
+            operator = ctx.Minus().getText();
+        }
+        return {
+            type: "BinaryExpression",
+            operator: operator,
+            left: this.visit(ctx.expression()[0]),
+            right: this.visit(ctx.expression()[1])
+        }
     }
 
 
@@ -596,7 +684,6 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         if (ctx.GreaterThanEquals() != null) {
             operator = ctx.GreaterThanEquals().getText();
         }
-
         return {
             type: "BinaryExpression",
             operator: operator,
@@ -619,7 +706,12 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#BitNotExpression.
     visitBitNotExpression(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "UnaryExpression",
+            operator: "~",
+            prefix: true,
+            argument: this.visit(ctx.expression()),
+        };
     }
 
 
@@ -796,22 +888,49 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#literal.
     visitLiteral(ctx) {
+        if (ctx.arrayLiteral() != null) {
+            return this.visit(ctx.arrayLiteral());
+        }
+        if (ctx.structLiteral() != null) {
+            return this.visit(ctx.structLiteral());
+        }
+        let value = ctx.getText();
+        
+        const text = ctx.getText();
+        const asInt = parseInt(text);
+        const asFloat = parseFloat(text);
+        if (!isNaN(asInt)) {
+            value = asInt;
+        }
+        if (!isNaN(asFloat)) {
+            value = asFloat;
+        }
+        if (text == "true" || text == "false") {
+            value = (text == "true");
+        }
+        
         return {
             type: "Literal",
-            value: ctx.getText()
+            value: value
         }
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#arrayLiteral.
     visitArrayLiteral(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "ArrayExpression",
+            elements: this.visit(ctx.elementList())
+        }
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#elementList.
     visitElementList(ctx) {
-        return this.visitChildren(ctx);
+        if (ctx.expression() == null) {
+            return [];
+        }
+        return this.visit(ctx.expression());
     }
 
 

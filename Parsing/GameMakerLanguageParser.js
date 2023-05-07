@@ -110,7 +110,7 @@ const serializedATN = [4,1,107,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 3,30,15,0,237,239,3,26,13,0,238,237,1,0,0,0,238,239,1,0,0,0,239,241,1,0,
 0,0,240,236,1,0,0,0,240,241,1,0,0,0,241,242,1,0,0,0,242,243,3,118,59,0,243,
 25,1,0,0,0,244,246,3,28,14,0,245,244,1,0,0,0,246,247,1,0,0,0,247,245,1,0,
-0,0,247,248,1,0,0,0,248,27,1,0,0,0,249,250,5,67,0,0,250,251,3,58,29,0,251,
+0,0,247,248,1,0,0,0,248,27,1,0,0,0,249,250,5,67,0,0,250,251,3,60,30,0,251,
 253,5,14,0,0,252,254,3,2,1,0,253,252,1,0,0,0,253,254,1,0,0,0,254,29,1,0,
 0,0,255,256,5,83,0,0,256,258,5,14,0,0,257,259,3,2,1,0,258,257,1,0,0,0,258,
 259,1,0,0,0,259,31,1,0,0,0,260,261,5,86,0,0,261,263,3,60,30,0,262,264,3,
@@ -1084,7 +1084,7 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	        this.state = 249;
 	        this.match(GameMakerLanguageParser.Case);
 	        this.state = 250;
-	        this.expressionSequence();
+	        this.expression(0);
 	        this.state = 251;
 	        this.match(GameMakerLanguageParser.Colon);
 	        this.state = 253;
@@ -4374,8 +4374,8 @@ class CaseClauseContext extends antlr4.ParserRuleContext {
 	    return this.getToken(GameMakerLanguageParser.Case, 0);
 	};
 
-	expressionSequence() {
-	    return this.getTypedRuleContext(ExpressionSequenceContext,0);
+	expression() {
+	    return this.getTypedRuleContext(ExpressionContext,0);
 	};
 
 	Colon() {

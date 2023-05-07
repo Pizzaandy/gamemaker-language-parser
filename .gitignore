@@ -1,4 +1,5 @@
 .antlr/
+*.cpuprofile
 
 # Logs
 logs
