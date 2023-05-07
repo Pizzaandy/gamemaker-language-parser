@@ -420,12 +420,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#anonymousFunction.
-	visitAnonymousFunction(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#accessorQualifier.
 	visitAccessorQualifier(ctx) {
 	  return this.visitChildren(ctx);

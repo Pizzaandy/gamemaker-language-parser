@@ -156,7 +156,7 @@ expressionSequence
     ;
 
 expression
-    : anonymousFunction # FunctionExpression
+    : Function_ parameterList statement # FunctionExpression
     | expression '[' accessorQualifier? expressionSequence ']' # MemberIndexExpression
     | expression '.' expression # MemberDotExpression
     | New identifier arguments # NewExpression
@@ -202,10 +202,6 @@ incDecStatement
     | expression '--' eos? # PostDecreaseStatement
     | '++' expression eos? # PreIncrementStatement
     | '--' expression eos? # PreDecreaseStatement
-    ;
-
-anonymousFunction
-    : Function_ arguments statement
     ;
     
 accessorQualifier
@@ -316,7 +312,7 @@ defineStatement
     ;
 
 regionStatement
-    : (Region | EndRegion) PpBodyCharacters* PpEnd?
+    : (Region | EndRegion) PpBodyCharacters? PpEnd?
     ;
 
 keyword
