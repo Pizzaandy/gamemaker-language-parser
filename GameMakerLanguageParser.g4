@@ -305,11 +305,11 @@ macroStatement
     ;
     
 defineStatement
-    : Define RegionCharacters RegionEOL
+    : Define RegionCharacters (RegionEOL | EOF)
     ;
 
 regionStatement
-    : (Region | EndRegion) RegionCharacters? RegionEOL
+    : (Region | EndRegion) RegionCharacters? (RegionEOL | EOF)
     ;
 
 // handles macros used as statements

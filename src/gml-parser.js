@@ -4,7 +4,7 @@ import GameMakerLanguageParser from '../Generated/GameMakerLanguageParser.js';
 import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
 
-export function parse(text) {
+export function parse(text, includeComments=true) {
     const chars = new antlr4.InputStream(text);
     const lexer = new GameMakerLanguageLexer(chars);
     lexer.strictMode = false;
@@ -22,7 +22,7 @@ export function parse(text) {
     }
 
     lexer.reset();
-    let comments = collectComments(lexer);
+    const comments = includeComments ? collectComments(lexer) : [];
 
     const visitor = new GMLVisitor(comments);
 
@@ -34,8 +34,8 @@ export function parse(text) {
     }
 }
 
-export function logTokens(text) {
-    console.log("Tokens");
+export function printTokens(text) {
+    console.log("==== Tokens ====");
     const chars = new antlr4.InputStream(text);
     const lexer = new GameMakerLanguageLexer(chars);
     lexer.strictMode = false;
@@ -61,19 +61,25 @@ function collectComments(lexer) {
     ) {
         if (token.type == GameMakerLanguageLexer.SingleLineComment) {
             comments.push({
-                value: token.text.replace(/^\/+/, '').trim()
+                type: "CommentLine",
+                value: token.text.replace(/^[\/][\/]/, ''),
+                start: token.start,
+                end: token.stop
             });
         }
         if (token.type == GameMakerLanguageLexer.MultiLineComment) {
             comments.push({
-                value: token.text.replace(/^[\/\*]+/, '').replace(/[\*\/]+$/, '')
+                type: "CommentBlock",
+                value: token.text.replace(/^[\/][\*]/, '').replace(/[\*][\/]$/, ''),
+                start: token.start,
+                end: token.stop
             });
         }
     }
     return comments;
 }
 
-export class GMLVisitor extends GameMakerLanguageParserVisitor {
+class GMLVisitor extends GameMakerLanguageParserVisitor {
     constructor(comments = []) {
         super();
         this.commentList = comments;
@@ -97,7 +103,7 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         let statements = ctx.statement();
         let list = []
         for (let i = 0; i < statements.length; i++) {
-            const stmtObject = this.visit(statements[i]);
+            let stmtObject = this.visit(statements[i]);
             if (stmtObject == null) { continue; }
             list.push(stmtObject);
         }
@@ -184,14 +190,17 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         if (!ctx.statementList()) {
             return { type: "BlockStatement", body: [] };
         }
-        return { type: "BlockStatement", body: this.visit(ctx.statementList()) }
+        return { 
+            type: "BlockStatement", 
+            body: this.visit(ctx.statementList()) 
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#ifStatement.
     visitIfStatement(ctx) {
-        const test = this.visit(ctx.expression());
-        const consequent = this.visit(ctx.statement()[0]);
+        let test = this.visit(ctx.expression());
+        let consequent = this.visit(ctx.statement()[0]);
         let alternate = null;
 
         if (ctx.statement()[1] != null) {
@@ -208,13 +217,21 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#DoStatement.
     visitDoStatement(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "DoUntilStatement",
+            body: this.visit(ctx.statement()),
+            test: this.visit(ctx.expression())
+        };
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#WhileStatement.
     visitWhileStatement(ctx) {
-        return this.visitChildren(ctx);
+        return {
+            type: "WhileStatement",
+            test: this.visit(ctx.expression()),
+            body: this.visit(ctx.statement())
+        };
     }
 
 
@@ -455,10 +472,9 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#variableDeclarationList.
     visitVariableDeclarationList(ctx) {
-        const declaration = this.visit(ctx.variableDeclaration());
         return {
             type: "VariableDeclaration",
-            declarations: declaration,
+            declarations: this.visit(ctx.variableDeclaration()),
             kind: this.visit(ctx.varModifier())
         }
     }
@@ -681,7 +697,7 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#CallExpression.
     visitCallExpression(ctx) {
-        const callee = this.visit(ctx.expression());
+        let callee = this.visit(ctx.expression());
         return {
             type: "CallExpression",
             callee: callee,
@@ -870,7 +886,7 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#callStatement.
     visitCallStatement(ctx) {
-        const callee = this.visit(ctx.lValueExpression());
+        let callee = this.visit(ctx.lValueExpression());
         return {
             type: "CallStatement",
             callee: callee,
@@ -964,9 +980,10 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         }
         let value = ctx.getText();
 
-        const text = ctx.getText();
-        const asInt = parseInt(text);
-        const asFloat = parseFloat(text);
+        let text = ctx.getText();
+        let asInt = parseInt(text);
+        let asFloat = parseFloat(text);
+
         if (!isNaN(asInt)) {
             value = asInt;
         }
@@ -1166,7 +1183,7 @@ export class GMLVisitor extends GameMakerLanguageParserVisitor {
         if (ctx.RegionCharacters() != null) {
             name = ctx.RegionCharacters().getText();
         }
-        if (ctx.RegionCharacters() != null) {
+        if (ctx.Region() != null) {
             return {
                 type: "RegionStatement",
                 name: name
