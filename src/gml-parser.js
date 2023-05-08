@@ -1,7 +1,7 @@
 import antlr4 from 'antlr4';
-import GameMakerLanguageLexer from './Parsing/GameMakerLanguageLexer.js';
-import GameMakerLanguageParser from './Parsing/GameMakerLanguageParser.js';
-import GameMakerLanguageParserVisitor from './Parsing/GameMakerLanguageParserVisitor.js';
+import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
+import GameMakerLanguageParser from '../Generated/GameMakerLanguageParser.js';
+import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
 
 export function parse(text) {

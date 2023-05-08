@@ -1,11 +1,12 @@
 import ErrorListener from 'antlr4/src/antlr4/error/ErrorListener.js';
-import GameMakerLanguageLexer from './Parsing/GameMakerLanguageLexer.js';
+import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
 
 export default class GameMakerParseErrorListener extends ErrorListener {
     constructor() {
         super();
     }
 
+    // TODO: better error messages
     syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
         const parser = recognizer;
         const wrongSymbol = offendingSymbol.text;
