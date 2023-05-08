@@ -2,6 +2,18 @@ lexer grammar GameMakerLanguageLexer;
 
 channels { ERROR }
 
+@lexer::members {
+    this.ignoreNewline = true;
+    this.lastTokenType = null;
+    GameMakerLanguageLexer.prototype.nextToken = function() {
+        var next = antlr4.Lexer.prototype.nextToken.call(this);
+        if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
+            this.lastTokenType = next.type;
+        }
+        return next;
+    }
+}
+
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 
@@ -106,10 +118,13 @@ Try:                            'try';
 Enum:                           'enum';
 Constructor:                    'constructor';
 Static:                         'static';
-Macro:                          '#macro' -> mode(PREPROCESSOR_IDENTIFIER);
-Define:                         '#define' -> mode(PREPROCESSOR_IDENTIFIER);
-Region:                         '#region' -> mode(PREPROCESSOR_BODY);
-EndRegion:                      '#endregion' -> mode(PREPROCESSOR_BODY);
+
+Macro: '#macro' {this.ignoreNewline = false};
+EscapedNewLine: '\\';
+
+Define: '#define' -> pushMode(REGION_NAME);
+Region: '#region' -> pushMode(REGION_NAME);
+EndRegion: '#endregion' -> pushMode(REGION_NAME);
 
 /// Identifier Names and Identifiers
 
@@ -117,16 +132,6 @@ Identifier
     : IdentifierStart IdentifierPart*
     ;
     
-fragment IdentifierStart
-    : [\p{L}] | '_';
-    
-fragment IdentifierPart
-    : IdentifierStart
-    | [\p{Mn}]
-    | [\p{Nd}]
-    | [\p{Pc}]
-    ;
-
 /// String Literals
 
 StringLiteral: '"' StringCharacter* '"';
@@ -145,7 +150,16 @@ WhiteSpaces
     ;
 
 LineTerminator
-    : [\r\n\u2028\u2029] -> channel(HIDDEN)
+    : [\r\n\u2028\u2029] {
+        if (this.ignoreNewline) {
+            this._channel = 1;
+        }
+        if (this.lastTokenType == GameMakerLanguageLexer.EscapedNewLine) {
+            this._channel = 1;
+        } else {
+            this.ignoreNewline = true;
+        }
+    }
     ;
 
 UnexpectedCharacter
@@ -153,6 +167,17 @@ UnexpectedCharacter
     ;
 
 /// Fragment rules
+
+fragment IdentifierStart
+    : [\p{L}] | '_'
+    ;
+    
+fragment IdentifierPart
+    : IdentifierStart
+    | [\p{Mn}]
+    | [\p{Nd}]
+    | [\p{Pc}]
+    ;
 
 fragment StringCharacter
     : ~["\\\r\n]
@@ -176,32 +201,12 @@ fragment DecimalIntegerLiteral
     | [1-9] [0-9_]*
     ;
 
-mode PREPROCESSOR_IDENTIFIER;
+mode REGION_NAME;
 
-PpIdentifier
-    : IdentifierStart IdentifierPart* -> mode(PREPROCESSOR_BODY)
+RegionCharacters
+    : ~[\r\n\u2028\u2029]+
     ;
     
-PpWhiteSpaces
-    : [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN)
+RegionEOL
+    : [\r\n\u2028\u2029] -> popMode
     ;
-
-mode PREPROCESSOR_BODY;
-
-// exclude: whitespace, newlines, \, #
-PpBodyCharacters
-    : ~[\r\n\u2028\u2029\\]+
-    ;
-
-PpNewLineEscaped
-    : '\\' (PpBodyCharacters+)? PpNewLine
-    ;
-    
-PpEnd
-    : (PpNewLine) -> mode(DEFAULT_MODE)
-    ;
-    
-fragment PpNewLine
-    : [\r\n\u2028\u2029]
-    ;
-

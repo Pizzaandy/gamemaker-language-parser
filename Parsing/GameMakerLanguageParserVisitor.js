@@ -198,6 +198,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
+	// Visit a parse tree produced by GameMakerLanguageParser#CallLValue.
+	visitCallLValue(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by GameMakerLanguageParser#ParenthesizedLValue.
 	visitParenthesizedLValue(ctx) {
 	  return this.visitChildren(ctx);
@@ -534,12 +540,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#macroBody.
-	visitMacroBody(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#defineStatement.
 	visitDefineStatement(ctx) {
 	  return this.visitChildren(ctx);
@@ -548,6 +548,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#regionStatement.
 	visitRegionStatement(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#identifierStatement.
+	visitIdentifierStatement(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -584,6 +590,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#eos.
 	visitEos(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#macroToken.
+	visitMacroToken(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

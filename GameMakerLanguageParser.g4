@@ -34,6 +34,7 @@ statement
     | enumeratorDeclaration
     | defineStatement
     | regionStatement
+    | identifierStatement
     ;
     
 block
@@ -149,6 +150,7 @@ lValueExpression
     | lValueExpression '.' identifier # MemberDotLValue
     | identifier # IdentifierLValue
     | '(' lValueExpression ')' # ParenthesizedLValue
+    | lValueExpression arguments # CallLValue
     ;
 
 expressionSequence
@@ -194,7 +196,7 @@ expression
     ;
     
 callStatement
-    : expression arguments eos? 
+    : lValueExpression arguments eos? 
     ;
 
 incDecStatement
@@ -299,20 +301,20 @@ enumerator
     ;
 
 macroStatement
-    : Macro PpIdentifier macroBody PpEnd?
-    ;
-    
-// handles multi-line macros just in case
-macroBody
-    : (PpBodyCharacters | PpNewLineEscaped)+
+    : Macro identifier macroToken+ (LineTerminator | EOF)
     ;
     
 defineStatement
-    : Define PpIdentifier PpEnd?
+    : Define RegionCharacters RegionEOL
     ;
 
 regionStatement
-    : (Region | EndRegion) PpBodyCharacters? PpEnd?
+    : (Region | EndRegion) RegionCharacters? RegionEOL
+    ;
+
+// handles macros used as statements
+identifierStatement
+    : identifier eos?
     ;
 
 keyword
@@ -358,3 +360,23 @@ eos
     : SemiColon
     ;
     
+// every token except:
+// WhiteSpaces, LineTerminator, Define, Macro, Region, EndRegion, UnexpectedCharacter
+// with added MacroLineContinuation
+macroToken
+    : EscapedNewLine | OpenBracket | CloseBracket | OpenParen | CloseParen 
+    | OpenBrace | CloseBrace | Begin | End | SemiColon | Comma | Assign | Colon 
+    | Dot | PlusPlus | MinusMinus | Plus | Minus | BitNot | Not | Multiply | Divide 
+    | IntegerDivide | Modulo | Power | QuestionMark | NullCoalesce 
+    | NullCoalescingAssign | RightShiftArithmetic | LeftShiftArithmetic 
+    | LessThan | MoreThan | LessThanEquals | GreaterThanEquals | Equals_ | NotEquals 
+    | BitAnd | BitXOr | BitOr | And | Or | Xor | MultiplyAssign | DivideAssign | PlusAssign 
+    | MinusAssign | ModulusAssign | LeftShiftArithmeticAssign | RightShiftArithmeticAssign 
+    | BitAndAssign | BitXorAssign | BitOrAssign | NumberSign | DollarSign | AtSign 
+    | UndefinedLiteral | NoOneLiteral | BooleanLiteral | IntegerLiteral | DecimalLiteral 
+    | BinaryLiteral | HexIntegerLiteral | Break | Exit | Do | Case | Else | New 
+    | Var | GlobalVar | Catch | Finally | Return | Continue | For | Switch | While 
+    | Until | Repeat | Function_ | With | Default | If | Then | Throw | Delete 
+    | Try | Enum | Constructor | Static | Identifier
+    | StringLiteral | TemplateStringLiteral | VerbatimStringLiteral
+    ;

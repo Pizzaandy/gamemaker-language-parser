@@ -1,21 +1,9 @@
-import { parse } from './gml-parser.js';
+import { parse, logTokens } from './gml-parser.js';
+import fs from 'fs';
 
-const input = 
-`
-switch (direction) {
-    case 1:
-        sprite_index = spr_idle_up;
-        a = [1.25, foo(), 3, false, noone]
-        break;
-    default:
-        break;
-}
-`
-
-console.profile();
+const fp = 'Parsing/test/__scribble_gen_6_build_lines.gml';
+let input = fs.readFileSync(fp, 'utf8');
 
 const ast = parse(input);
-const str = JSON.stringify(ast, null, 2);
-console.log(str);
+console.log(JSON.stringify(ast, null, 2));
 
-console.profileEnd();
