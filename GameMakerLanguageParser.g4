@@ -239,13 +239,22 @@ literal
     | BooleanLiteral
     | StringLiteral
     | VerbatimStringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | HexIntegerLiteral
     | BinaryLiteral
     | DecimalLiteral
     | IntegerLiteral
     | arrayLiteral
     | structLiteral
+    ;
+
+templateStringLiteral
+    : TemplateStringStart templateStringAtom* TemplateStringEnd
+    ;
+
+templateStringAtom
+    : TemplateStringText
+    | TemplateStringStartExpression expression TemplateStringEndExpression
     ;
 
 arrayLiteral
@@ -377,6 +386,7 @@ macroToken
     | BinaryLiteral | HexIntegerLiteral | Break | Exit | Do | Case | Else | New 
     | Var | GlobalVar | Catch | Finally | Return | Continue | For | Switch | While 
     | Until | Repeat | Function_ | With | Default | If | Then | Throw | Delete 
-    | Try | Enum | Constructor | Static | Identifier
-    | StringLiteral | TemplateStringLiteral | VerbatimStringLiteral
+    | Try | Enum | Constructor | Static | Identifier | StringLiteral | VerbatimStringLiteral
+    | TemplateStringStart | TemplateStringEnd | TemplateStringText | TemplateStringStartExpression
+    | TemplateStringEndExpression
     ;

@@ -5,6 +5,7 @@ channels { ERROR }
 @lexer::members {
     this.ignoreNewline = true;
     this.lastTokenType = null;
+    this.templateDepth = 0;
     GameMakerLanguageLexer.prototype.nextToken = function() {
         var next = antlr4.Lexer.prototype.nextToken.call(this);
         if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
@@ -22,6 +23,7 @@ CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
 OpenBrace:                      '{';
+TemplateStringEndExpression:    '}' {this.templateDepth > 0}? -> popMode;
 CloseBrace:                     '}';
 Begin:                          'begin';
 End:                            'end';
@@ -136,7 +138,9 @@ Identifier
 
 StringLiteral: '"' StringCharacter* '"';
 
-TemplateStringLiteral: '$"' StringCharacter* '"';
+TemplateStringStart
+    : '$"' {this.templateDepth++} -> pushMode(TEMPLATE_STRING)
+    ;
 
 VerbatimStringLiteral
     : '@"' (~'"' | '""')* '"'
@@ -210,3 +214,9 @@ RegionCharacters
 RegionEOL
     : [\r\n\u2028\u2029] -> popMode
     ;
+
+mode TEMPLATE_STRING;
+
+TemplateStringEnd: '"' {this.templateDepth--} -> popMode;
+TemplateStringStartExpression: '{' -> pushMode(DEFAULT_MODE);
+TemplateStringText: ~('{' | '\\' | '"' | [\r\n\u2028\u2029])+;
