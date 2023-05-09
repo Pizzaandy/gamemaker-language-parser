@@ -2,14 +2,18 @@ import { parse, printTokens } from './src/gml-parser.js';
 import fs from 'fs';
 import clipboardy from 'clipboardy';
 
-const fp = './test/__scribble_gen_6_build_lines.gml';
+const fp = './test/SnowState.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = String.raw`abc.123 = foo`
+// input = String.raw`
+//foo = bar
+//`
 
-const ast = parse(input);
+console.profile("parse");
+const ast = parse(input, {getLocationInformation: false});
+console.profileEnd();
+
 const astText = JSON.stringify(ast, null, 2);
-
 clipboardy.writeSync(astText);
 
 const lines = astText.split('\n');
