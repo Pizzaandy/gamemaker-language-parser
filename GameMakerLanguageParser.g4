@@ -12,8 +12,8 @@ statementList
     
 statement
     : (block
-    | variableDeclarationList
     | emptyStatement
+    | variableDeclarationList
     | ifStatement
     | iterationStatement
     | continueStatement
@@ -34,10 +34,9 @@ statement
     | callStatement
     | functionDeclaration
     | constructorDeclaration
-    | identifierStatement
     ) eos?
     ;
-    
+
 block
     : openBlock statementList? closeBlock
     ;

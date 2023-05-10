@@ -2,7 +2,7 @@ import { parse, printTokens } from './src/gml-parser.js';
 import fs from 'fs';
 import clipboardy from 'clipboardy';
 
-const fp = './test/SnowState.gml';
+const fp = './test/cursed_gml.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
 

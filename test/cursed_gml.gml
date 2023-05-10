@@ -12,7 +12,6 @@ return
 
 a()
 .member
-literallyJustAnIdentifier
 
 for (var i:=-1; ++i<>10; { var j=-1; while ++j<10 begin // comment1
 	array[i, j] = 0; // comment2
@@ -20,7 +19,7 @@ for (var i:=-1; ++i<>10; { var j=-1; while ++j<10 begin // comment1
 comment3
 */
 
-((a).b[0 = 0].c) = (b) = c #macro foo bar = \
+(a).b[0 = 0].c = (b) = c #macro foo bar = \
 "@-*&"
 b = x < 5 && !x==2 || x==4;
 x = (str = "hello?") + @"

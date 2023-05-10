@@ -202,10 +202,6 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
         if (ctx.regionStatement() != null) {
             return this.visit(ctx.regionStatement());
         }
-
-        if (ctx.identifierStatement() != null) {
-            return this.visit(ctx.identifierStatement());
-        }
         return null;
     }
 
