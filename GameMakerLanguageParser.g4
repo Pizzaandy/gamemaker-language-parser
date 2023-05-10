@@ -12,7 +12,6 @@ statementList
     
 statement
     : (block
-    | emptyStatement
     | ifStatement
     | variableDeclarationList
     | iterationStatement
@@ -33,8 +32,7 @@ statement
     | incDecStatement
     | callStatement
     | functionDeclaration
-    | constructorDeclaration
-    ) eos?
+    ) eos*
     ;
 
 block
@@ -163,14 +161,9 @@ expressionSequence
     ;
 
 expression
-    : Function_ parameterList statement # FunctionExpression
-    | expression accessor expressionSequence ']' # MemberIndexExpression
-    | expression '.' expression # MemberDotExpression
-    | New identifier arguments # NewExpression
-
-    | callableExpression arguments # CallExpression
-    | lValueExpression ('++' | '--') # PostIncDecExpression
-    | ('++' | '--') lValueExpression # PreIncDecExpression
+    : ('++' | '--') lValueExpression # PreIncDecExpression
+    | lValueExpression ('++' | '--' | arguments)? # PreIncDecExpression
+    | functionDeclaration # FunctionExpression
 
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
@@ -202,7 +195,6 @@ callStatement
 callableExpression
     : lValueExpression
     | functionDeclaration
-    | constructorDeclaration
     | '(' callableExpression ')'
     ;
 
@@ -280,13 +272,9 @@ elementList
 structLiteral
     : openBlock (propertyAssignment (',' propertyAssignment)* ','?)? closeBlock
     ;
-    
-functionDeclaration
-    : Function_ identifier parameterList statement
-    ;
 
-constructorDeclaration
-    : Function_ identifier? parameterList (':' identifier parameterList)? Constructor statement
+functionDeclaration
+    : Function_ identifier? parameterList ((':' identifier parameterList)? Constructor)? statement
     ;
     
 parameterList
@@ -377,5 +365,6 @@ macroToken
     | Until | Repeat | Function_ | With | Default | If | Then | Throw | Delete 
     | Try | Enum | Constructor | Static | Identifier | StringLiteral | VerbatimStringLiteral
     | TemplateStringStart | TemplateStringEnd | TemplateStringText | TemplateStringStartExpression
-    | TemplateStringEndExpression
+    | TemplateStringEndExpression | OpenBracket | ListAccessor | MapAccessor | GridAccessor | ArrayAccessor 
+    | StructAccessor
     ;
