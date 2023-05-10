@@ -21,7 +21,8 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         throw (
             `Syntax Error (line ${line}, column ${column}): ` +
             `unexpected symbol '${wrongSymbol}', expecting ${expected}\n` +
-            msg
+            msg + "\n" +
+            `Stack: ${stack}`
         );
     }
 }

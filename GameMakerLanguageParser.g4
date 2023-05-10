@@ -142,10 +142,20 @@ globalVarStatement
     ;
 
 lValueExpression
-    : lValueExpression '[' accessorQualifier? expressionSequence ']' # MemberIndexLValue
-    | lValueExpression '.' identifier # MemberDotLValue
-    | identifier # IdentifierLValue
+    : ('(' lValueExpression ')' | identifier) lValueChainOperator* lValueFinalOperator # CompoundLValue
     | '(' lValueExpression ')' # ParenthesizedLValue
+    | identifier # IdentifierLValue
+    ;
+
+lValueChainOperator
+    : accessor expressionSequence ']' # MemberIndexLValue
+    | '.' identifier # MemberDotLValue
+    | arguments # CallLValue
+    ;
+
+lValueFinalOperator
+    : accessor expressionSequence ']' # MemberIndexLValueFinal
+    | '.' identifier # MemberDotLValueFinal
     ;
 
 expressionSequence
@@ -154,11 +164,11 @@ expressionSequence
 
 expression
     : Function_ parameterList statement # FunctionExpression
-    | expression '[' accessorQualifier? expressionSequence ']' # MemberIndexExpression
+    | expression accessor expressionSequence ']' # MemberIndexExpression
     | expression '.' expression # MemberDotExpression
     | New identifier arguments # NewExpression
 
-    | expression arguments # CallExpression
+    | callableExpression arguments # CallExpression
     | lValueExpression ('++' | '--') # PostIncDecExpression
     | ('++' | '--') lValueExpression # PreIncDecExpression
 
@@ -186,7 +196,14 @@ expression
     ;
     
 callStatement
-    : expression arguments
+    : callableExpression arguments
+    ;
+
+callableExpression
+    : lValueExpression
+    | functionDeclaration
+    | constructorDeclaration
+    | '(' callableExpression ')'
     ;
 
 incDecStatement
@@ -196,8 +213,13 @@ incDecStatement
     | '--' lValueExpression  # PreDecreaseStatement
     ;
     
-accessorQualifier
-    : '#' | '@' | '$' | '?' | '|'
+accessor
+    : OpenBracket
+    | ListAccessor
+    | MapAccessor
+    | GridAccessor
+    | ArrayAccessor
+    | StructAccessor
     ;
     
 arguments
@@ -338,7 +360,7 @@ eos
     
 // every token except:
 // WhiteSpaces, LineTerminator, Define, Macro, Region, EndRegion, UnexpectedCharacter
-// with added MacroLineContinuation
+// includes EscapedNewLine
 macroToken
     : EscapedNewLine | OpenBracket | CloseBracket | OpenParen | CloseParen 
     | OpenBrace | CloseBrace | Begin | End | SemiColon | Comma | Assign | Colon 

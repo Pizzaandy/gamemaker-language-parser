@@ -6,9 +6,9 @@ import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParser
 import GameMakerParseErrorListener from './gml-syntax-error.js';
 
 export function parse(
-    text, 
+    text,
     options = {
-        getComments: true, 
+        getComments: true,
         getLocationInformation: true
     }
 ) {
@@ -527,14 +527,30 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
         });
     }
 
+    // Visit a parse tree produced by GameMakerLanguageParser#CompoundLValue.
+    visitCompoundLValue(ctx) {
+        let object = null;
+        if (ctx.lValueExpression() != null) {
+            object = this.visit(ctx.lValueExpression());
+        }
+        if (ctx.identifier() != null) {
+            object = this.visit(ctx.identifier());
+        }
+        
+        // accumulate operations
+        if (ctx.lValueChainOperator() != null) {
+            const ops = ctx.lValueChainOperator();
+            for (let i = 0; i < ops.length; i++) {
+                let node = this.visit(ops[i]);
+                node.object = object;
+                object = node;
+            }
+        }
 
-    // Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValue.
-    visitMemberDotLValue(ctx) {
-        return this.astNode(ctx, {
-            type: "MemberDotExpression",
-            object: this.visit(ctx.lValueExpression()),
-            property: this.visit(ctx.identifier())
-        });
+        let finalOp = this.visit(ctx.lValueFinalOperator());
+        finalOp.object = object;
+
+        return finalOp;
     }
 
 
@@ -546,22 +562,68 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#IdentifierLValue.
     visitIdentifierLValue(ctx) {
-        return this.visit(ctx.identifier());
+        return this.astNode({
+            type: "Identifier",
+            name: this.visit(ctx.identifier())
+        });
     }
 
 
     // Visit a parse tree produced by GameMakerLanguageParser#MemberIndexLValue.
     visitMemberIndexLValue(ctx) {
-        let qualifier = null;
-        if (ctx.accessorQualifier() != null) {
-            qualifier = this.visit(ctx.accessorQualifier());
-        }
         return this.astNode(ctx, {
             type: "MemberIndexExpression",
-            object: this.visit(ctx.lValueExpression()),
+            object: null,
             property: this.visit(ctx.expressionSequence()),
-            qualifier: qualifier
+            qualifier: this.visit(ctx.accessor())
         });
+    }
+
+
+    // Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValue.
+    visitMemberDotLValue(ctx) {
+        return this.astNode(ctx, {
+            type: "MemberDotExpression",
+            object: null,
+            property: this.visit(ctx.identifier())
+        });
+    }
+
+
+    // Visit a parse tree produced by GameMakerLanguageParser#CallLValue.
+    visitCallLValue(ctx) {
+        return this.astNode(ctx, {
+            type: "CallExpression",
+            object: null,
+            arguments: this.visit(ctx.arguments())
+        });
+    }
+
+    // Visit a parse tree produced by GameMakerLanguageParser#MemberIndexLValueFinal.
+    visitMemberIndexLValueFinal(ctx) {
+        return this.visitMemberIndexLValue(ctx);
+    }
+
+    // Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValueFinal.
+    visitMemberDotLValueFinal(ctx) {
+        return this.visitMemberDotLValue(ctx);
+    }
+
+
+    // Visit a parse tree produced by GameMakerLanguageParser#callableExpression.
+    visitCallableExpression(ctx) {
+        if (ctx.lValueExpression() != null) {
+            return this.visit(ctx.lValueExpression());
+        }
+        if (ctx.functionDeclaration() != null) {
+            return this.visit(ctx.functionDeclaration());
+        }
+        if (ctx.constructorDeclaration() != null) {
+            return this.visit(ctx.constructorDeclaration());
+        }
+        if (ctx.callableExpression() != null) {
+            return this.visit(ctx.callableExpression());
+        }
     }
 
 
@@ -679,10 +741,9 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#CallExpression.
     visitCallExpression(ctx) {
-        let callee = this.visit(ctx.expression());
         return this.astNode(ctx, {
             type: "CallExpression",
-            callee: callee,
+            object: this.visit(ctx.callableExpression()),
             arguments: this.visit(ctx.arguments())
         });
     }
@@ -757,8 +818,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     // Visit a parse tree produced by GameMakerLanguageParser#PostIncrementExpression.
     visitPostIncDecExpression(ctx) {
         let operator = null;
-        if (ctx.PlusPlus() != null) {operator = ctx.PlusPlus().getText();}
-        if (ctx.MinusMinus() != null) {operator = ctx.MinusMinus().getText();}
+        if (ctx.PlusPlus() != null) { operator = ctx.PlusPlus().getText(); }
+        if (ctx.MinusMinus() != null) { operator = ctx.MinusMinus().getText(); }
         return this.astNode(ctx, {
             type: "UnaryExpression",
             operator: operator,
@@ -770,8 +831,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     // Visit a parse tree produced by GameMakerLanguageParser#PostIncrementExpression.
     visitPreIncDecExpression(ctx) {
         let operator = null;
-        if (ctx.PlusPlus() != null) {operator = ctx.PlusPlus().getText();}
-        if (ctx.MinusMinus() != null) {operator = ctx.MinusMinus().getText();}
+        if (ctx.PlusPlus() != null) { operator = ctx.PlusPlus().getText(); }
+        if (ctx.MinusMinus() != null) { operator = ctx.MinusMinus().getText(); }
         return this.astNode(ctx, {
             type: "UnaryExpression",
             operator: operator,
@@ -820,15 +881,11 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#MemberIndexExpression.
     visitMemberIndexExpression(ctx) {
-        let qualifier = null;
-        if (ctx.accessorQualifier() != null) {
-            qualifier = this.visit(ctx.accessorQualifier());
-        }
         return this.astNode(ctx, {
             type: "MemberIndexExpression",
             object: this.visit(ctx.expression()),
             property: this.visit(ctx.expressionSequence()),
-            qualifier: qualifier
+            qualifier: this.visit(ctx.accessor())
         });
     }
 
@@ -884,7 +941,10 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#callStatement.
     visitCallStatement(ctx) {
-        let callee = this.visit(ctx.expression());
+        let callee = null;
+        if (ctx.callableExpression() != null) {
+            callee = this.visit(ctx.callableExpression());
+        }
         return this.astNode(ctx, {
             type: "CallStatement",
             callee: callee,
@@ -963,8 +1023,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     // Visit a parse tree produced by GameMakerLanguageParser#assignmentOperator.
     visitAssignmentOperator(ctx) {
         let text = ctx.getText();
-        if (text == ':=') { 
-            text = '='; 
+        if (text == ':=') {
+            text = '=';
         }
         return text;
     }
@@ -1162,7 +1222,7 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
             name = this.visit(ctx.softKeyword());
         }
         return this.astNode(ctx, {
-            type: "Identifier", name: name 
+            type: "Identifier", name: name
         });
     }
 

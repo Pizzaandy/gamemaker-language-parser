@@ -186,8 +186,8 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValue.
-	visitMemberDotLValue(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#CompoundLValue.
+	visitCompoundLValue(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -206,6 +206,30 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#MemberIndexLValue.
 	visitMemberIndexLValue(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValue.
+	visitMemberDotLValue(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#CallLValue.
+	visitCallLValue(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#MemberIndexLValueFinal.
+	visitMemberIndexLValueFinal(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValueFinal.
+	visitMemberDotLValueFinal(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -264,14 +288,14 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#MultiplicativeExpression.
-	visitMultiplicativeExpression(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#CallExpression.
+	visitCallExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#CallExpression.
-	visitCallExpression(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#MultiplicativeExpression.
+	visitMultiplicativeExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -378,6 +402,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
+	// Visit a parse tree produced by GameMakerLanguageParser#callableExpression.
+	visitCallableExpression(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by GameMakerLanguageParser#PostIncrementStatement.
 	visitPostIncrementStatement(ctx) {
 	  return this.visitChildren(ctx);
@@ -402,8 +432,8 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#accessorQualifier.
-	visitAccessorQualifier(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#accessor.
+	visitAccessor(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

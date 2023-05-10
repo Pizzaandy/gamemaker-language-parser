@@ -18,8 +18,14 @@ channels { ERROR }
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 
-OpenBracket:                    '[';
+OpenBracket: '[';
+ListAccessor: '[|'; 
+MapAccessor: '[?'; 
+GridAccessor: '[#';
+ArrayAccessor: '[@';
+StructAccessor: '[$'; 
 CloseBracket:                   ']';
+
 OpenParen:                      '(';
 CloseParen:                     ')';
 OpenBrace:                      '{';

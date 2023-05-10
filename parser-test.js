@@ -6,6 +6,10 @@ import clipboardy from 'clipboardy';
 const fp = './test/SnowState.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
+// input = `
+// (function foo() {})() // good
+// `;
+
 const ast = parse(input, {getLocationInformation:false});
 
 const astText = JSON.stringify(ast, null, 3);
