@@ -19,7 +19,7 @@ for (var i:=-1; ++i<>10; { var j=-1; while ++j<10 begin // comment1
 comment3
 */
 
-(a).b[0 = 0].c = (b) = c #macro foo bar = \
+((a).b[0 = 0].c) = (true) = false #macro foo bar = \
 "@-*&"
 b = x < 5 && !x==2 || x==4;
 x = (str = "hello?") + @"

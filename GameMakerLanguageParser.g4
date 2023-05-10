@@ -5,7 +5,7 @@ options {tokenVocab=GameMakerLanguageLexer;}
 program
     : statementList? EOF
     ;
-    
+
 statementList
     : statement+
     ;
@@ -13,8 +13,8 @@ statementList
 statement
     : (block
     | emptyStatement
-    | variableDeclarationList
     | ifStatement
+    | variableDeclarationList
     | iterationStatement
     | continueStatement
     | breakStatement
@@ -48,7 +48,7 @@ ifStatement
 iterationStatement
     : Do statement Until expression # DoStatement
     | While expression statement # WhileStatement
-    | For '(' 
+    | For '('
         (variableDeclarationList | assignmentExpression)? ';' 
         expression? ';' 
         statement? 
@@ -145,6 +145,7 @@ lValueExpression
     : lValueExpression '[' accessorQualifier? expressionSequence ']' # MemberIndexLValue
     | lValueExpression '.' identifier # MemberDotLValue
     | identifier # IdentifierLValue
+    | '(' lValueExpression ')' # ParenthesizedLValue
     ;
 
 expressionSequence
@@ -164,19 +165,16 @@ expression
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
     | Not expression # NotExpression
-
+    
     | expression ('*' | '/' | Modulo | IntegerDivide) expression # MultiplicativeExpression
     | expression ('+' | '-') expression # AdditiveExpression
     | expression '??' expression # CoalesceExpression
     | expression ('<<' | '>>') expression # BitShiftExpression
-    
     | expression Or expression # LogicalOrExpression
     | expression And expression # LogicalAndExpression
     | expression Xor expression # LogicalXorExpression
-
     | expression ('==' | Assign | NotEquals) expression # EqualityExpression
     | expression ('<' | '>' | '<=' | '>=') expression # RelationalExpression
-
     | expression '&' expression # BitAndExpression
     | expression '|' expression # BitOrExpression
     | expression '^' expression # BitXOrExpression
@@ -192,8 +190,8 @@ callStatement
     ;
 
 incDecStatement
-    : lValueExpression '++'  # PostIncrementStatement
-    | lValueExpression '--'  # PostDecreaseStatement
+    : lValueExpression '++' # PostIncrementStatement
+    | lValueExpression '--' # PostDecreaseStatement
     | '++' lValueExpression  # PreIncrementStatement
     | '--' lValueExpression  # PreDecreaseStatement
     ;
