@@ -570,12 +570,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#keyword.
-	visitKeyword(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#softKeyword.
 	visitSoftKeyword(ctx) {
 	  return this.visitChildren(ctx);

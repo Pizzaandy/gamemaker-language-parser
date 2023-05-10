@@ -11,30 +11,31 @@ statementList
     ;
     
 statement
-    : block
-    | emptyStatement
-    | macroStatement
-    | iterationStatement
+    : (block
     | variableDeclarationList
-    | globalVarStatement
+    | emptyStatement
     | assignmentStatement
     | incDecStatement
     | callStatement
     | ifStatement
+    | iterationStatement
+    | continueStatement
+    | breakStatement
     | returnStatement
     | withStatement
-    | continueStatement
     | switchStatement
     | tryStatement
     | throwStatement
-    | breakStatement
     | exitStatement
-    | constructorDeclaration
-    | functionDeclaration
-    | enumeratorDeclaration
+    | macroStatement
     | defineStatement
     | regionStatement
+    | enumeratorDeclaration
+    | globalVarStatement
+    | functionDeclaration
+    | constructorDeclaration
     | identifierStatement
+    ) eos?
     ;
     
 block
@@ -46,7 +47,7 @@ ifStatement
     ;
     
 iterationStatement
-    : Do statement Until expression eos? # DoStatement
+    : Do statement Until expression # DoStatement
     | While expression statement # WhileStatement
     | For '(' 
         (variableDeclarationList | assignmentExpression)? ';' 
@@ -65,15 +66,15 @@ switchStatement
     ;
     
 continueStatement
-    : Continue eos?
+    : Continue
     ;
 
 breakStatement
-    : Break eos?
+    : Break
     ;
     
 exitStatement
-    : Exit eos?
+    : Exit
     ;
     
 emptyStatement
@@ -97,7 +98,7 @@ defaultClause
     ;
 
 throwStatement
-    : Throw expression eos?
+    : Throw expression
     ;
 
 tryStatement
@@ -113,15 +114,15 @@ finallyProduction
     ;
     
 returnStatement
-    : Return expression? eos?
+    : Return expression?
     ;
 
 deleteStatement
-    : Delete expression eos?
+    : Delete expression
     ;
 
 assignmentStatement
-    : assignmentExpression eos?
+    : assignmentExpression
     ;
 
 assignmentExpression
@@ -196,14 +197,14 @@ expression
     ;
     
 callStatement
-    : lValueExpression arguments eos? 
+    : lValueExpression arguments
     ;
 
 incDecStatement
-    : expression '++' eos? # PostIncrementStatement
-    | expression '--' eos? # PostDecreaseStatement
-    | '++' expression eos? # PreIncrementStatement
-    | '--' expression eos? # PreDecreaseStatement
+    : expression '++'  # PostIncrementStatement
+    | expression '--'  # PostDecreaseStatement
+    | '++' expression  # PreIncrementStatement
+    | '--' expression  # PreDecreaseStatement
     ;
     
 accessorQualifier
@@ -298,7 +299,7 @@ identifier
     ;
     
 enumeratorDeclaration
-    : Enum identifier openBlock enumeratorList? closeBlock
+    : Enum identifier openBlock enumeratorList? ','? closeBlock
     ;
     
 enumeratorList
@@ -323,30 +324,7 @@ regionStatement
 
 // handles macros used as statements
 identifierStatement
-    : identifier eos?
-    ;
-
-keyword
-    : Break
-    | Do
-    | Case
-    | Else
-    | New
-    | Var
-    | Catch
-    | Finally
-    | Return
-    | Continue
-    | For
-    | Switch
-    | While
-    | Function_
-    | With
-    | Default
-    | If
-    | Throw
-    | Delete
-    | Try
+    : identifier
     ;
     
 softKeyword

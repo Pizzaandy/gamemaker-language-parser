@@ -8,15 +8,18 @@ let input = fs.readFileSync(fp, 'utf8');
 // input = String.raw`
 //foo = bar
 //`
+//console.profile("parse");
+console.time();
 
-console.profile("parse");
-const ast = parse(input, {getLocationInformation: false});
-console.profileEnd();
+const ast = parse(input, {getLocationInformation: true});
+
+console.timeEnd();
+//console.profileEnd();
 
 const astText = JSON.stringify(ast, null, 2);
 clipboardy.writeSync(astText);
 
-const lines = astText.split('\n');
-for (let i = 0; i < lines.length; i++) {
-    console.log(lines[i]);
-}
+// const lines = astText.split('\n');
+// for (let i = 0; i < lines.length; i++) {
+//     console.log(lines[i]);
+// }
