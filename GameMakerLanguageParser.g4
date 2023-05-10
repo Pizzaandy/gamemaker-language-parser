@@ -14,9 +14,6 @@ statement
     : (block
     | variableDeclarationList
     | emptyStatement
-    | assignmentStatement
-    | incDecStatement
-    | callStatement
     | ifStatement
     | iterationStatement
     | continueStatement
@@ -32,6 +29,9 @@ statement
     | regionStatement
     | enumeratorDeclaration
     | globalVarStatement
+    | assignmentExpression
+    | incDecStatement
+    | callStatement
     | functionDeclaration
     | constructorDeclaration
     | identifierStatement
@@ -121,10 +121,6 @@ deleteStatement
     : Delete expression
     ;
 
-assignmentStatement
-    : assignmentExpression
-    ;
-
 assignmentExpression
     : lValueExpression assignmentOperator expression
     ;
@@ -150,8 +146,6 @@ lValueExpression
     : lValueExpression '[' accessorQualifier? expressionSequence ']' # MemberIndexLValue
     | lValueExpression '.' identifier # MemberDotLValue
     | identifier # IdentifierLValue
-    | '(' lValueExpression ')' # ParenthesizedLValue
-    | lValueExpression arguments # CallLValue
     ;
 
 expressionSequence
@@ -165,10 +159,8 @@ expression
     | New identifier arguments # NewExpression
 
     | expression arguments # CallExpression
-    | expression '++' # PostIncrementExpression
-    | expression '--' # PostDecreaseExpression
-    | '++' expression # PreIncrementExpression
-    | '--' expression # PreDecreaseExpression
+    | lValueExpression ('++' | '--') # PostIncDecExpression
+    | ('++' | '--') lValueExpression # PreIncDecExpression
 
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
@@ -197,14 +189,14 @@ expression
     ;
     
 callStatement
-    : lValueExpression arguments
+    : expression arguments
     ;
 
 incDecStatement
-    : expression '++'  # PostIncrementStatement
-    | expression '--'  # PostDecreaseStatement
-    | '++' expression  # PreIncrementStatement
-    | '--' expression  # PreDecreaseStatement
+    : lValueExpression '++'  # PostIncrementStatement
+    | lValueExpression '--'  # PostDecreaseStatement
+    | '++' lValueExpression  # PreIncrementStatement
+    | '--' lValueExpression  # PreDecreaseStatement
     ;
     
 accessorQualifier

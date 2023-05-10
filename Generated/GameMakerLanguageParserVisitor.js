@@ -156,12 +156,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#assignmentStatement.
-	visitAssignmentStatement(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#assignmentExpression.
 	visitAssignmentExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -198,18 +192,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#CallLValue.
-	visitCallLValue(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#ParenthesizedLValue.
-	visitParenthesizedLValue(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#IdentifierLValue.
 	visitIdentifierLValue(ctx) {
 	  return this.visitChildren(ctx);
@@ -240,12 +222,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PreIncrementExpression.
-	visitPreIncrementExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#LogicalOrExpression.
 	visitLogicalOrExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -258,12 +234,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PreDecreaseExpression.
-	visitPreDecreaseExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#FunctionExpression.
 	visitFunctionExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -272,12 +242,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#UnaryMinusExpression.
 	visitUnaryMinusExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#PostDecreaseExpression.
-	visitPostDecreaseExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -306,6 +270,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
+	// Visit a parse tree produced by GameMakerLanguageParser#PreIncDecExpression.
+	visitPreIncDecExpression(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by GameMakerLanguageParser#BitShiftExpression.
 	visitBitShiftExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -330,12 +300,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PostIncrementExpression.
-	visitPostIncrementExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#BitNotExpression.
 	visitBitNotExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -344,6 +308,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#NewExpression.
 	visitNewExpression(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#PostIncDecExpression.
+	visitPostIncDecExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

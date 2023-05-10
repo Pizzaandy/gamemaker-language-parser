@@ -5,15 +5,9 @@ import clipboardy from 'clipboardy';
 const fp = './test/SnowState.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-// input = String.raw`
-//foo = bar
-//`
+
 //console.profile("parse");
-console.time();
-
-const ast = parse(input, {getLocationInformation: true});
-
-console.timeEnd();
+const ast = parse(input);
 //console.profileEnd();
 
 const astText = JSON.stringify(ast, null, 2);
