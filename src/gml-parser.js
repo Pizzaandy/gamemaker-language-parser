@@ -52,12 +52,7 @@ export default class GMLParser {
 
         console.time("build ast");
         let astTree = {};
-        try {
-            astTree = visitor.visitProgram(tree);
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
+        astTree = visitor.visitProgram(tree);
         console.timeEnd("build ast");
 
         return astTree;
@@ -85,8 +80,10 @@ export default class GMLParser {
         console.log("");
     }
 
+    // returns a list of comments in lexical order
     collectComments(lexer) {
         const comments = [];
+        let lineBreaksSinceLastComment = 0;
         for (
             let token = lexer.nextToken();
             token.type != GameMakerLanguageLexer.EOF;
@@ -97,7 +94,8 @@ export default class GMLParser {
                     type: "CommentLine",
                     value: token.text.replace(/^[\/][\/]/, ''),
                     start: token.start,
-                    end: token.stop
+                    end: token.stop,
+                    line: token.line
                 });
             }
             if (token.type == GameMakerLanguageLexer.MultiLineComment) {
@@ -105,8 +103,18 @@ export default class GMLParser {
                     type: "CommentBlock",
                     value: token.text.replace(/^[\/][\*]/, '').replace(/[\*][\/]$/, ''),
                     start: token.start,
-                    end: token.stop
+                    end: token.stop,
+                    line: token.line
                 });
+            }
+            if (token.type == GameMakerLanguageLexer.LineTerminator) {
+                lineBreaksSinceLastComment += 1;
+            }
+            if (
+                token.type != GameMakerLanguageLexer.LineTerminator 
+                && token.type != GameMakerLanguageLexer.WhiteSpaces
+            ) {
+                
             }
         }
         return comments;

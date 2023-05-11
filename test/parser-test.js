@@ -8,6 +8,7 @@ let input = fs.readFileSync(fp, 'utf8');
 // const options = {
 //     getLocationInformation: false,
 // }
+input = `if (/*bruh*/ foo) bar()`
 
 console.time();
 const ast = GMLParser.parse(input);

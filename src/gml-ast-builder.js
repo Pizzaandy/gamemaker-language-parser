@@ -1,17 +1,20 @@
 import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
+import { associateCommentsWithNode } from './gml-comment.js';
 
 export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {
     constructor(comments = [], options) {
         super();
         this.commentList = comments;
         this.getLocationInformation = options.getLocationInformation;
+        this.nodeList = [];
     }
 
-    // process an ast node
+    // add context data to the node
     astNode(ctx, object) {
         if (this.getLocationInformation) {
             object.start = ctx.start.start;
             object.end = ctx.stop.stop;
+            associateCommentsWithNode(object, ctx, this.commentList);
         }
         return object
     }
@@ -944,6 +947,9 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         if (ctx.templateStringLiteral() != null) {
             return this.visit(ctx.templateStringLiteral());
         }
+        if (ctx.HexIntegerLiteral() != null || ctx.BinaryLiteral() != null) {
+            return ctx.getText();
+        }
 
         let value = ctx.getText();
 
@@ -972,9 +978,11 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
     visitTemplateStringLiteral(ctx) {
         let atoms = [];
         let atomList = [];
+
         if (ctx.templateStringAtom() != null) {
             atoms = ctx.templateStringAtom();
         }
+
         for (let i = 0; i < atoms.length; i++) {
             let atom = atoms[i];
             if (atom.expression() != null) {
@@ -987,6 +995,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
                 });
             }
         }
+
         return this.astNode(ctx, {
             type: "TemplateStringExpression",
             atoms: atomList
