@@ -83,38 +83,53 @@ export default class GMLParser {
     // returns a list of comments in lexical order
     collectComments(lexer) {
         const comments = [];
+        let previousComment;
         let lineBreaksSinceLastComment = 0;
+
         for (
             let token = lexer.nextToken();
             token.type != GameMakerLanguageLexer.EOF;
             token = lexer.nextToken()
         ) {
+            console.log("Index: ", token.tokenIndex);
+
+            if (token.type == GameMakerLanguageLexer.LineTerminator) {
+                lineBreaksSinceLastComment += 1;
+                continue;
+            }
+
+            if (token.type == GameMakerLanguageLexer.WhiteSpaces) { 
+                continue; 
+            }
+
+            if (previousComment) {
+                previousComment.trailingNewlines = lineBreaksSinceLastToken;
+            }
+            lineBreaksSinceLastComment = 0;
+
             if (token.type == GameMakerLanguageLexer.SingleLineComment) {
+                previousComment = token;
                 comments.push({
                     type: "CommentLine",
                     value: token.text.replace(/^[\/][\/]/, ''),
                     start: token.start,
                     end: token.stop,
-                    line: token.line
+                    line: token.line,
+                    trailingNewlines: 0
                 });
             }
-            if (token.type == GameMakerLanguageLexer.MultiLineComment) {
+            else if (token.type == GameMakerLanguageLexer.MultiLineComment) {
+                previousComment = token;
                 comments.push({
                     type: "CommentBlock",
                     value: token.text.replace(/^[\/][\*]/, '').replace(/[\*][\/]$/, ''),
                     start: token.start,
                     end: token.stop,
-                    line: token.line
+                    line: token.line,
+                    trailingNewlines: 0
                 });
-            }
-            if (token.type == GameMakerLanguageLexer.LineTerminator) {
-                lineBreaksSinceLastComment += 1;
-            }
-            if (
-                token.type != GameMakerLanguageLexer.LineTerminator 
-                && token.type != GameMakerLanguageLexer.WhiteSpaces
-            ) {
-                
+            } else {
+                previousComment = null;
             }
         }
         return comments;
