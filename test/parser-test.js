@@ -2,16 +2,16 @@ import GMLParser from '../src/gml-parser.js';
 import fs from 'fs';
 import clipboardy from 'clipboardy';
 
-const fp = './test/test.gml';
+const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-const parser = new GMLParser(
-    input, {
-        getLocationInformation: true,
-    }
-);
+// const options = {
+//     getLocationInformation: false,
+// }
 
-const ast = parser.parse(input);
+console.time();
+const ast = GMLParser.parse(input);
+console.timeEnd();
 
 const astText = JSON.stringify(ast, null, 3);
 clipboardy.writeSync(astText);

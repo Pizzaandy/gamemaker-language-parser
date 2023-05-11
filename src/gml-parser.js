@@ -6,31 +6,37 @@ import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParser
 import GameMakerParseErrorListener from './gml-syntax-error.js';
 
 export default class GMLParser {
-    constructor(
-        text, 
-        options = options = {
-        getComments: true,
-        getLocationInformation: true
-    }
-    ) {
+    constructor(text, options) {
         this.text = text;
         this.options = options;
     }
 
-    parse(text = this.text, options = this.options) {
-        const getComments = options.getComments;
-        const getLocationInformation = options.getLocationInformation;
+    static parse(
+        text, 
+        options = {
+            getComments: true,
+            getLocationInformation: true,
+        }
+    ) {
+        return new this(text, options).parse();
+    }
 
-        const chars = new antlr4.InputStream(text);
+    parse() {
+        console.time("lex");
+        const chars = new antlr4.InputStream(this.text);
         const lexer = new GameMakerLanguageLexer(chars);
         lexer.strictMode = false;
         const tokens = new antlr4.CommonTokenStream(lexer);
         const parser = new GameMakerLanguageParser(tokens);
+
+        console.timeEnd("lex");
+
         parser._interp.predictionMode = PredictionMode.SLL;
+
         parser.removeErrorListeners();
         parser.addErrorListener(new GameMakerParseErrorListener());
 
-        console.time();
+        console.time("parse");
         try {
             var tree = parser.program();
         } catch (error) {
@@ -38,18 +44,23 @@ export default class GMLParser {
             console.timeEnd();
             return null;
         }
-        console.timeEnd();
+        console.timeEnd("parse");
 
         lexer.reset();
-        const comments = getComments ? collectComments(lexer) : [];
-        const visitor = new GMLVisitor(comments, getLocationInformation);
+        const comments = this.options.getComments ? this.collectComments(lexer) : [];
+        const visitor = new GameMakerASTBuilder(comments, this.options);
 
+        console.time("build ast");
+        let astTree = {};
         try {
-            return visitor.visitProgram(tree);
+            astTree = visitor.visitProgram(tree);
         } catch (error) {
             console.error(error);
             return null;
         }
+        console.timeEnd("build ast");
+
+        return astTree;
     }
 
     printTokens(text) {
@@ -102,13 +113,14 @@ export default class GMLParser {
     }
 }
 
-class GMLVisitor extends GameMakerLanguageParserVisitor {
-    constructor(comments = [], getLocationInformation = true) {
+class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {
+    constructor(comments = [], options) {
         super();
         this.commentList = comments;
-        this.getLocationInformation = getLocationInformation;
+        this.getLocationInformation = options.getLocationInformation;
     }
 
+    // process an ast node
     astNode(ctx, object) {
         if (this.getLocationInformation) {
             object.start = ctx.start.start;
@@ -501,9 +513,10 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#varModifier.
     visitVarModifier(ctx) {
-        if (ctx.Var() != null) {
+        if (ctx.Var().length > 0) {
             return "var";
-        } else if (ctx.Static() != null) {
+        }
+        if (ctx.Static() != null) {
             return "static";
         }
     }
@@ -533,14 +546,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#CompoundLValue.
     visitCompoundLValue(ctx) {
-        let object = null;
-        if (ctx.lValueExpression() != null) {
-            object = this.visit(ctx.lValueExpression());
-        }
-        if (ctx.identifier() != null) {
-            object = this.visit(ctx.identifier());
-        }
-        
+        let object = this.visit(ctx.lValueStartExpression());
+
         // accumulate operations
         if (ctx.lValueChainOperator() != null) {
             const ops = ctx.lValueChainOperator();
@@ -557,10 +564,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
         return finalOp;
     }
 
-
-    // Visit a parse tree produced by GameMakerLanguageParser#ParenthesizedLValue.
-    visitParenthesizedLValue(ctx) {
-        return this.visit(ctx.lValueExpression());
+    visitSimpleLValue(ctx) {
+        return this.visit(ctx.lValueStartExpression());
     }
 
 
@@ -573,6 +578,18 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     }
 
 
+    // Visit a parse tree produced by GameMakerLanguageParser#NewLValue.
+    visitNewLValue(ctx) {
+        return this.visit(ctx.newExpression());
+    }
+
+
+    // Visit a parse tree produced by GameMakerLanguageParser#ParenthesizedLValue.
+    visitParenthesizedLValue(ctx) {
+        return this.visit(ctx.lValueExpression());
+    }
+
+
     // Visit a parse tree produced by GameMakerLanguageParser#MemberIndexLValue.
     visitMemberIndexLValue(ctx) {
         return this.astNode(ctx, {
@@ -582,7 +599,6 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
             accessor: this.visit(ctx.accessor())
         });
     }
-
 
     // Visit a parse tree produced by GameMakerLanguageParser#MemberDotLValue.
     visitMemberDotLValue(ctx) {
@@ -621,9 +637,6 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
         }
         if (ctx.functionDeclaration() != null) {
             return this.visit(ctx.functionDeclaration());
-        }
-        if (ctx.constructorDeclaration() != null) {
-            return this.visit(ctx.constructorDeclaration());
         }
         if (ctx.callableExpression() != null) {
             return this.visit(ctx.callableExpression());
@@ -745,11 +758,7 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#CallExpression.
     visitCallExpression(ctx) {
-        return this.astNode(ctx, {
-            type: "CallExpression",
-            object: this.visit(ctx.callableExpression()),
-            arguments: this.visit(ctx.arguments())
-        });
+        return this.visit(ctx.callStatement());
     }
 
 
@@ -894,9 +903,9 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     }
 
 
-    // Visit a parse tree produced by GameMakerLanguageParser#IdentifierExpression.
-    visitIdentifierExpression(ctx) {
-        return this.visitChildren(ctx)[0];
+    // Visit a parse tree produced by GameMakerLanguageParser#VariableExpression.
+    visitVariableExpression(ctx) {
+        return this.visit(ctx.lValueExpression());
     }
 
 
@@ -945,13 +954,16 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
 
     // Visit a parse tree produced by GameMakerLanguageParser#callStatement.
     visitCallStatement(ctx) {
-        let callee = null;
+        let object = null;
         if (ctx.callableExpression() != null) {
-            callee = this.visit(ctx.callableExpression());
+            object = this.visit(ctx.callableExpression());
+        }
+        if (ctx.callStatement() != null) {
+            object = this.visit(ctx.callStatement());
         }
         return this.astNode(ctx, {
-            type: "CallStatement",
-            callee: callee,
+            type: "CallExpression",
+            object: object,
             arguments: this.visit(ctx.arguments())
         });
     }
@@ -1121,7 +1133,7 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     // Visit a parse tree produced by GameMakerLanguageParser#structLiteral.
     visitStructLiteral(ctx) {
         let properties = [];
-        if (ctx.propertyAssignment() == null) {
+        if (ctx.propertyAssignment().length > 0) {
             properties = this.visit(ctx.propertyAssignment());
         }
         return this.astNode(ctx, {
@@ -1201,8 +1213,8 @@ class GMLVisitor extends GameMakerLanguageParserVisitor {
     visitPropertyAssignment(ctx) {
         return this.astNode(ctx, {
             type: "Property",
-            name: this.visit(ctx.expression()),
-            value: this.visit(ctx.propertyIdentifier())
+            name: this.visit(ctx.propertyIdentifier()),
+            value: this.visit(ctx.expression())
         });
     }
 

@@ -12,6 +12,7 @@ statementList
     
 statement
     : (block
+    | emptyStatement
     | ifStatement
     | variableDeclarationList
     | iterationStatement
@@ -32,7 +33,7 @@ statement
     | incDecStatement
     | callStatement
     | functionDeclaration
-    ) eos*
+    ) eos?
     ;
 
 block
@@ -139,10 +140,19 @@ globalVarStatement
     : GlobalVar identifier (',' identifier)* SemiColon
     ;
 
-lValueExpression
-    : ('(' lValueExpression ')' | identifier) lValueChainOperator* lValueFinalOperator # CompoundLValue
+newExpression
+    : New identifier arguments
+    ;
+
+lValueStartExpression
+    : identifier # IdentifierLValue
+    | newExpression # NewLValue
     | '(' lValueExpression ')' # ParenthesizedLValue
-    | identifier # IdentifierLValue
+    ;
+
+lValueExpression
+    : lValueStartExpression lValueChainOperator* lValueFinalOperator # CompoundLValue
+    | lValueStartExpression # SimpleLValue
     ;
 
 lValueChainOperator
@@ -162,7 +172,9 @@ expressionSequence
 
 expression
     : ('++' | '--') lValueExpression # PreIncDecExpression
-    | lValueExpression ('++' | '--' | arguments)? # PreIncDecExpression
+    | lValueExpression ('++' | '--') # PostIncDecExpression
+    | lValueExpression # VariableExpression
+    | callStatement # CallExpression
     | functionDeclaration # FunctionExpression
 
     | '-' expression # UnaryMinusExpression
@@ -183,18 +195,18 @@ expression
     | expression '^' expression # BitXOrExpression
 
     | expression '?' expression ':' expression # TernaryExpression
-    | identifier # IdentifierExpression
     | literal # LiteralExpression
     | '(' expression ')' # ParenthesizedExpression
     ;
     
 callStatement
     : callableExpression arguments
+    | callStatement arguments
     ;
 
 callableExpression
     : lValueExpression
-    | functionDeclaration
+    | '(' functionDeclaration ')'
     | '(' callableExpression ')'
     ;
 

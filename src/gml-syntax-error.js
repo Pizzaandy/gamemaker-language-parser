@@ -20,9 +20,7 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         const symbolStr = parser.getExpectedTokens().toString(parser.symbolicNames);
         throw (
             `Syntax Error (line ${line}, column ${column}): ` +
-            `unexpected symbol '${wrongSymbol}', expecting ${expected}\n` +
-            msg + "\n" +
-            `Stack: ${stack}`
+            `unexpected symbol '${wrongSymbol}', expecting ${expected}\n`
         );
     }
 }
