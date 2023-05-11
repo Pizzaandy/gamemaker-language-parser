@@ -1,5 +1,4 @@
 import ErrorListener from 'antlr4/src/antlr4/error/ErrorListener.js';
-import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
 
 export default class GameMakerParseErrorListener extends ErrorListener {
     constructor() {
