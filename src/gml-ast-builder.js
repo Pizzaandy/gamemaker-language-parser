@@ -1,35 +1,40 @@
 import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
-import { associateCommentsWithNode } from './gml-comment.js';
+import { associateCommentsWithNodes } from './gml-comments.js';
 
 export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {
-    constructor(comments = [], options) {
+    constructor(options, comments = [], whiteSpace = []) {
         super();
         this.commentList = comments;
+        this.wsList = whiteSpace;
         this.getLocationInformation = options.getLocationInformation;
-        this.nodeList = [];
+        this.nodes = comments.concat(whiteSpace);
     }
 
     // add context data to the node
     astNode(ctx, object) {
         if (this.getLocationInformation) {
-            object.start = ctx.start.start;
-            object.end = ctx.stop.stop;
-            associateCommentsWithNode(object, ctx, this.commentList);
+            object.start = { line: ctx.start.line, index: ctx.start.start };
+            object.end = {
+                line: ctx.stop.line + (ctx.stop.text.match(/[\r\n\u2028\u2029]/g) || '').length, 
+                index: ctx.stop.stop 
+            };
         }
+        this.nodes.push(object);
         return object
     }
 
     // Visit a parse tree produced by GameMakerLanguageParser#program.
-    visitProgram(ctx) {
+    build(ctx) {
         let body = [];
         if (ctx.statementList() != null) {
             body = this.visit(ctx.statementList());
         }
-        return this.astNode(ctx, {
+        const ast = this.astNode(ctx, {
             type: "Program",
             body: body,
-            comments: this.commentList,
         });
+        associateCommentsWithNodes(this);
+        return ast;
     }
 
     // Visit a parse tree produced by GameMakerLanguageParser#statementList.

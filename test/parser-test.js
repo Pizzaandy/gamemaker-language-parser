@@ -5,10 +5,13 @@ import clipboardy from 'clipboardy';
 const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-// const options = {
-//     getLocationInformation: false,
-// }
-input = `if (/*bruh*/ foo) bar()`
+input = `
+// fuck
+function (){
+
+
+}
+`;
 
 console.time();
 const ast = GMLParser.parse(input);
