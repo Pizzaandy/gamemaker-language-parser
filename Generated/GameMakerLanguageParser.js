@@ -3632,7 +3632,7 @@ class ProgramContext extends antlr4.ParserRuleContext {
 
 	accept(visitor) {
 	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
-	        return visitor.visitProgram(this);
+	        return visitor.build(this);
 	    } else {
 	        return visitor.visitChildren(this);
 	    }
