@@ -33,7 +33,9 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
             type: "Program",
             body: body,
         });
+
         associateCommentsWithNodes(this);
+        
         return ast;
     }
 
@@ -74,6 +76,9 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         }
         if (ctx.switchStatement() != null) {
             return this.visit(ctx.switchStatement());
+        }
+        if (ctx.enumeratorDeclaration() != null) {
+            return this.visit(ctx.enumeratorDeclaration());
         }
 
         if (ctx.incDecStatement() != null) {
@@ -1142,7 +1147,12 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#enumeratorDeclaration.
     visitEnumeratorDeclaration(ctx) {
-        return this.visitChildren(ctx);
+        return this.astNode(ctx, {
+            type: "EnumDeclaration",
+            name: this.visit(ctx.identifier()),
+            members: this.visit(ctx.enumeratorList()),
+            hasTrailingComma: (ctx.Comma() != null)
+        });
     }
 
 
@@ -1154,7 +1164,15 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#enumerator.
     visitEnumerator(ctx) {
-        return this.visitChildren(ctx);
+        let initializer = null;
+        if (ctx.IntegerLiteral()) {
+            initializer = ctx.IntegerLiteral().getText();
+        }
+        return this.astNode(ctx, {
+            type: "EnumMember",
+            name: this.visit(ctx.identifier()),
+            initializer: initializer
+        });
     }
 
 

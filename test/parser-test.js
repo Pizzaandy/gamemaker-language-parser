@@ -5,13 +5,10 @@ import clipboardy from 'clipboardy';
 const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = `
-// fuck
-function (){
-
-
-}
-`;
+input = `enum foo {
+    bar, // bar
+    baz, //baz
+}`;
 
 console.time();
 const ast = GMLParser.parse(input);

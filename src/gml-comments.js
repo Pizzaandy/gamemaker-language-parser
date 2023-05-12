@@ -12,9 +12,10 @@ export function associateCommentsWithNodes(builder) {
         idx += direction;
         while (
             (builder.nodes[idx] !== undefined) && (
-                builder.nodes[idx].type === "CommentLine" ||
-                builder.nodes[idx].type === "CommentBlock" ||
-                builder.nodes[idx].type === "WhiteSpace"
+                !builder.nodes[idx].type.includes("Statement") &&
+                !builder.nodes[idx].type.includes("Expression") &&
+                !builder.nodes[idx].type.includes("Declaration") &&
+                !builder.nodes[idx].type.includes("Enum")
             )
         ) {
             idx += direction;
@@ -26,15 +27,35 @@ export function associateCommentsWithNodes(builder) {
         if (node.comments == undefined) {
             node.comments = [];
         }
+        //console.log(`attached comment '${comment.value}' to node ${node.text}`)
         node.comments.push(comment);
     }
 
     // sort nodes in lexical order
-    builder.nodes.sort((a, b) => a.start.index - b.start.index);
+    builder.nodes.sort(function(a, b) {
+        // sort nodes by size if they start at the same index 
+        if (a.start.index === b.start.index) {
+            console.log(`node ${a.type}, size: ${(a.end.index - a.start.index + 1)}`);
+            console.log(`node ${b.type}, size: ${(b.end.index - b.start.index + 1)}\n`);
+            return (b.end.index - b.start.index) - (a.end.index - a.start.index);
+        }
+        return a.start.index - b.start.index;
+    });
+
+    for (const node of builder.nodes) {
+        console.log(node.type);
+    }
+
+    let rootNode;
 
     for (let i = 0; i < builder.nodes.length; i++) {
         const node = builder.nodes[i];
         node.trailingNewLines = 0;
+
+        if (node.type === "Program") { 
+            rootNode = node; 
+            continue;
+        }
 
         if (node.type === "WhiteSpace" && node.isNewline) {
             if (i > 0) {
@@ -61,8 +82,11 @@ export function associateCommentsWithNodes(builder) {
 
             // 3) comment starts before next node and is not 
             // already associated with the previous node
-            else {
+            else if (nextNode) {
                 attachComment(nextNode, node);
+            } else {
+                // dangling comment!
+                attachComment(rootNode, node);
             }
         }
     }

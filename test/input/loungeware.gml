@@ -1,4 +1,7 @@
 function ___init_advanced_text(){
+
+
+    
     /*
     
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
