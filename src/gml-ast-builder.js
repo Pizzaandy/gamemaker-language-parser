@@ -1,13 +1,10 @@
 import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
-import { associateCommentsWithNodes } from './gml-comments.js';
+import { getLineBreakCount } from './gml-parser.js';
 
 export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {
-    constructor(options, comments = [], whiteSpace = []) {
+    constructor(options) {
         super();
-        this.commentList = comments;
-        this.wsList = whiteSpace;
         this.getLocationInformation = options.getLocationInformation;
-        this.nodes = comments.concat(whiteSpace);
     }
 
     // add context data to the node
@@ -15,12 +12,11 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         if (this.getLocationInformation) {
             object.start = { line: ctx.start.line, index: ctx.start.start };
             object.end = {
-                line: ctx.stop.line + (ctx.stop.text.match(/[\r\n\u2028\u2029]/g) || '').length, 
+                line: ctx.stop.line + getLineBreakCount(ctx.stop.text), 
                 index: ctx.stop.stop 
             };
         }
-        this.nodes.push(object);
-        return object
+        return object;
     }
 
     // Visit a parse tree produced by GameMakerLanguageParser#program.
@@ -33,9 +29,6 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
             type: "Program",
             body: body,
         });
-
-        associateCommentsWithNodes(this);
-        
         return ast;
     }
 
@@ -1158,7 +1151,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#enumeratorList.
     visitEnumeratorList(ctx) {
-        return this.visitChildren(ctx);
+        return this.visit(ctx.enumerator());
     }
 
 
