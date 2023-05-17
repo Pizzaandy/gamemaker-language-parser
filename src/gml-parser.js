@@ -4,33 +4,42 @@ import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
 import GameMakerLanguageParser from '../Generated/GameMakerLanguageParser.js';
 import GameMakerASTBuilder from './gml-ast-builder.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
+import { attachComments } from './gml-comments.js';
 
 export default class GMLParser {
     constructor(text, options) {
         this.text = text;
-        this.options = options;
         this.whitespaces = [];
+        this.comments = [];
+        this.options = Object.assign({}, GMLParser.optionDefaults, options);
+    }
+
+    static optionDefaults = {
+        handleComments: true,
+        getLocations: true,
+        simplifyLocations: true,
     }
 
     static parse(
         text,
         options = {
-            getHiddenNodes: true,
-            getLocationInformation: true,
+            handleComments: true,
+            getLocations: true,
+            simplifyLocations: true
         }
     ) {
         return new this(text, options).parse();
     }
 
     parse() {
-        console.time("lex");
+        console.time("lexing");
         const chars = new antlr4.InputStream(this.text);
         const lexer = new GameMakerLanguageLexer(chars);
         lexer.strictMode = false;
         const tokens = new antlr4.CommonTokenStream(lexer);
         const parser = new GameMakerLanguageParser(tokens);
 
-        console.timeEnd("lex");
+        console.timeEnd("lexing");
 
         parser._interp.predictionMode = PredictionMode.SLL;
         parser.removeErrorListeners();
@@ -46,18 +55,25 @@ export default class GMLParser {
         }
         console.timeEnd("PARSING");
 
-        if (this.options.getHiddenNodes) {
+        console.time("building ast");
+
+        if (this.options.handleComments) {
             lexer.reset();
-            this.whitespaces = this.getHiddenNodes(lexer);
-            //console.log(JSON.stringify(this.whitespaces, null, 2));
+            this.getHiddenNodes(lexer);
         }
 
-        const builder = new GameMakerASTBuilder(this.options);
-
-        console.time("build ast");
+        const builder = new GameMakerASTBuilder(this.options, this.whitespaces);
         let astTree = {};
         astTree = builder.build(tree);
-        console.timeEnd("build ast");
+        attachComments(astTree, this.comments);
+
+        if (!this.options.getLocations) {
+            this.removeLocationInfo(astTree);
+        } else if (this.options.simplifyLocations) {
+            this.simplifyLocationInfo(astTree);
+        }
+
+        console.timeEnd("building ast");
 
         return astTree;
     }
@@ -84,18 +100,22 @@ export default class GMLParser {
         console.log("");
     }
 
-    // returns a list of non-significant nodes in lexical order
-    // two types: Whitespace and CommentWhitespace
+    // populates comments and whitespaces lists
+    // also records any trailing or leading whitespace on comments
     getHiddenNodes(lexer) {
-        let currentGroup = [];
         let nodes = [];
-
+        let reachedEOF = false;
+        let prevComment = null;
+        let prevWS = "";
         for (
             let token = lexer.nextToken();
-            token.type != GameMakerLanguageLexer.EOF;
+            !reachedEOF;
             token = lexer.nextToken()
         ) {
-            if (token.type == GameMakerLanguageLexer.SingleLineComment) {
+            if (token.type === GameMakerLanguageLexer.EOF) {
+                reachedEOF = true;
+
+            } else if (token.type == GameMakerLanguageLexer.SingleLineComment) {
                 let node = {
                     type: "CommentLine",
                     value: token.text.replace(/^[\/][\/]/, ''),
@@ -104,10 +124,14 @@ export default class GMLParser {
                         line: token.line,
                         index: token.stop
                     },
+                    leadingWS: prevWS,
+                    trailingWS: "",
                 };
-                currentGroup.push(node);
-            }
-            else if (token.type == GameMakerLanguageLexer.MultiLineComment) {
+                prevComment = node;
+                prevWS = "";
+                this.comments.push(node);
+
+            } else if (token.type == GameMakerLanguageLexer.MultiLineComment) {
                 let node = {
                     type: "CommentBlock",
                     value: token.text.replace(/^[\/][\*]/, '').replace(/[\*][\/]$/, ''),
@@ -116,10 +140,16 @@ export default class GMLParser {
                         line: token.line + getLineBreakCount(token.text),
                         index: token.stop
                     },
+                    leadingWS: prevWS,
+                    trailingWS: "",
                 };
-                currentGroup.push(node);
+                prevComment = node;
+                prevWS = "";
+                this.comments.push(node);
+
             } else if (token.type === GameMakerLanguageLexer.WhiteSpaces
                 || token.type === GameMakerLanguageLexer.LineTerminator) {
+                const isNewline = token.type === GameMakerLanguageLexer.LineTerminator;
                 let node = {
                     type: "Whitespace",
                     value: token.text,
@@ -129,33 +159,42 @@ export default class GMLParser {
                         index: token.stop
                     },
                     line: token.line,
-                    isNewline: token.type === GameMakerLanguageLexer.LineTerminator
+                    isNewline: isNewline
                 };
-                currentGroup.push(node);
-            } else {
-                // non-hidden token, end whitespace group
-                if (currentGroup.length < 1) { continue; }
-                let groupComments = [];
-                let groupText = "";
-                for (const wsNode of currentGroup) {
-                    if (wsNode.type === "CommentLine" || wsNode.type === "CommentBlock") {
-                        groupComments.push(wsNode);
-                    }
-                    groupText += wsNode.value;
+                this.whitespaces.push(node);
+                if (prevComment !== null) {
+                    prevComment.trailingWS += token.text;
                 }
-                nodes.push({
-                    type: groupComments.length > 0 ? "CommentWhitespace" : "Whitespace",
-                    text: groupText,
-                    comments: groupComments,
-                    start: currentGroup[0].start,
-                    end: currentGroup[currentGroup.length - 1].end,
-                    newLineCount: (groupText.matchAll(/[\r\n\u2028\u2029]/g) || []).length
-                });
-                currentGroup = [];
+                prevComment = null;
+                prevWS += token.text;
+
+            } else {
+                prevComment = null;
+                prevWS = "";
             }
         }
+    }
 
-        return nodes;
+    removeLocationInfo(obj) {
+        for (const prop in obj) {
+            if (prop === "start" || prop === "end") {
+                delete obj[prop];
+            } else if (typeof obj[prop] === "object") {
+                this.removeLocationInfo(obj[prop]);
+            }
+        }
+    }
+
+    simplifyLocationInfo(obj) {
+        for (const prop in obj) {
+            if (prop === "start") {
+                obj.start = obj.start.index;
+            } else if (prop === "end") {
+                obj.end = obj.end.index;
+            } else if (typeof obj[prop] === "object") {
+                this.simplifyLocationInfo(obj[prop]);
+            }
+        }
     }
 }
 

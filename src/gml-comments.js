@@ -1,93 +1,125 @@
-// A comment group (g) is associated with a node (n) if:
-//
-//   - g starts on the same line as n ends
-//   - g starts on the line immediately following n, and there is
-//     at least one empty line after g and before the next node
-//   - g starts before n and is not associated to the node before n
-//     via the previous rules
-//
+function getSortedChildNodes(node) {
+    const children = [];
+    const isObject = (object) => object !== null && typeof object === "object";
 
-export function associateCommentsWithNodes(builder) {
-    function findNeighborNode(idx, direction) {
-        idx += direction;
-        while (
-            (builder.nodes[idx] !== undefined) && (
-                !builder.nodes[idx].type.includes("Statement") &&
-                !builder.nodes[idx].type.includes("Expression") &&
-                !builder.nodes[idx].type.includes("Declaration") &&
-                !builder.nodes[idx].type.includes("Enum")
-            )
-        ) {
-            idx += direction;
+    for (const key of Object.keys(node)) {
+        if (["start", "end"].indexOf(key) > -1) { continue; }
+        const value = node[key];
+
+        if (Array.isArray(value)) {
+            for (const child of value) {
+                if (isObject(child)) {
+                    children.push(child);
+                }
+            }
+        } else if (isObject(value)) {
+            children.push(value);
         }
-        return builder.nodes[idx];
     }
 
-    function attachComment(node, comment) {
-        if (node.comments == undefined) {
-            node.comments = [];
+    children.sort((a, b) =>
+        a.start.index - b.start.index || a.end.index - b.end.index
+    );
+
+    return children;
+}
+
+function decorateComment(node, comment, enclosingNode) {
+    const commentStart = comment.start.index;
+    const commentEnd = comment.end.index;
+    const childNodes = getSortedChildNodes(node);
+
+    let precedingNode;
+    let followingNode;
+
+    // binary search for enclosing node, preceding node, and following node
+    // lifted from prettier lmao
+    let left = 0;
+    let right = childNodes.length;
+
+    while (left < right) {
+        const middle = (left + right) >> 1;
+        const child = childNodes[middle];
+        const start = child.start.index;
+        const end = child.end.index;
+
+        // The comment is completely contained by this child node.
+        if (start <= commentStart && commentEnd <= end) {
+            // Abandon the binary search at this level.
+            return decorateComment(child, comment, child);
         }
-        //console.log(`attached comment '${comment.value}' to node ${node.text}`)
-        node.comments.push(comment);
-    }
 
-    // sort nodes in lexical order
-    builder.nodes.sort(function(a, b) {
-        // sort nodes by size if they start at the same index 
-        if (a.start.index === b.start.index) {
-            console.log(`node ${a.type}, size: ${(a.end.index - a.start.index + 1)}`);
-            console.log(`node ${b.type}, size: ${(b.end.index - b.start.index + 1)}\n`);
-            return (b.end.index - b.start.index) - (a.end.index - a.start.index);
-        }
-        return a.start.index - b.start.index;
-    });
-
-    for (const node of builder.nodes) {
-        console.log(node.type);
-    }
-
-    let rootNode;
-
-    for (let i = 0; i < builder.nodes.length; i++) {
-        const node = builder.nodes[i];
-        node.trailingNewLines = 0;
-
-        if (node.type === "Program") { 
-            rootNode = node; 
+        if (end <= commentStart) {
+            // This child node falls completely before the comment.
+            // Because we will never consider this node or any nodes
+            // before it again, this node must be the closest preceding
+            // node we have encountered so far.
+            precedingNode = child;
+            left = middle + 1;
             continue;
         }
 
-        if (node.type === "WhiteSpace" && node.isNewline) {
-            if (i > 0) {
-                builder.nodes[i - 1].trailingNewLines += 1;
-            }
+        if (commentEnd <= start) {
+            // This child node falls completely after the comment.
+            // Because we will never consider this node or any nodes after
+            // it again, this node must be the closest following node we
+            // have encountered so far.
+            followingNode = child;
+            right = middle;
             continue;
         }
 
-        if (node.type === "CommentLine" || node.type === "CommentBlock") {
-            const nextNode = findNeighborNode(i, 1);
-            const prevNode = findNeighborNode(i, -1);
+        throw new Error("Comment location overlaps with node location");
+    }
 
-            // 1) comment starts on the same line as previous node ends
-            if (prevNode && prevNode.end.line === node.start.line) {
-                attachComment(prevNode, node);
-            }
+    return {
+        enclosingNode,
+        precedingNode,
+        followingNode
+    };
+}
 
-            // 2) comment starts on the line immediately after previous node, 
-            // and there is at least one empty line after the comment and before the next node
-            else if (prevNode && node.start.line === prevNode.end.line + 1 &&
-                nextNode && node.end.line < nextNode.start.line - 1) {
-                attachComment(prevNode, node);
-            }
-
-            // 3) comment starts before next node and is not 
-            // already associated with the previous node
-            else if (nextNode) {
-                attachComment(nextNode, node);
-            } else {
-                // dangling comment!
-                attachComment(rootNode, node);
-            }
+export function attachComments(ast, comments) {
+    ast.comments = comments;
+    const decoratedComments = comments.map(
+        comment => ({
+            comment: comment,
+            ...decorateComment(ast, comment),
+        })
+    );
+    for (const decorated of decoratedComments) {
+        console.log("\ncomment: ", decorated.comment.value);
+        if (decorated.enclosingNode !== undefined) {
+            console.log("enclosingNode: ", decorated.enclosingNode.type);
+        }
+        if (decorated.precedingNode !== undefined) {
+            console.log("precedingNode: ", decorated.precedingNode.type);
+        }
+        if (decorated.followingNode !== undefined) {
+            console.log("followingNode: ", decorated.followingNode.type);
         }
     }
+
+    for (const decoratedComment of decoratedComments) {
+        const {
+            comment,
+            enclosingNode,
+            precedingNode,
+            followingNode,
+            value: text,
+        } = decoratedComment;
+
+        if (isOwnLineComment(comment)) {
+            
+        }
+    }
+}
+
+const isAllEmptyAndNoLineBreak = (text) => !/[\S\n\u2028\u2029]/.test(text);
+function isOwnLineComment(comment) {
+    return hasNewline(comment.leadingWS) && hasNewline(comment.trailingWS);
+}
+
+function hasNewline(text) {
+    return text.split(/[\r\n\u2028\u2029]/).length > 0;
 }

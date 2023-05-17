@@ -8,14 +8,18 @@ export default class GameMakerParseErrorListener extends ErrorListener {
     // TODO: better error messages
     syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
         const parser = recognizer;
-        const wrongSymbol = offendingSymbol.text;
+        let wrongSymbol = offendingSymbol.text;
+
+        if (wrongSymbol === "<EOF>") {
+            wrongSymbol = "end of file";
+        } else {
+            wrongSymbol = `symbol '${wrongSymbol}'`;
+        }
 
         const tokens = parser.getInputStream();
         const stack = parser.getRuleInvocationStack();
 
         const currentRule = stack[0];
-
-        console.log(stack);
 
         if (currentRule == "block") {
             const openBraceToken = parser._ctx.openBlock().start;
@@ -36,21 +40,21 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         if (currentRule == "expression") {
             throw (
                 `Syntax Error (line ${line}, column ${column}): ` +
-                `unexpected symbol '${wrongSymbol}' in expression`
+                `unexpected ${wrongSymbol} in expression`
             );
         }
 
         if (currentRule == "statement") {
             throw (
                 `Syntax Error (line ${line}, column ${column}): ` +
-                `unexpected symbol '${wrongSymbol}' in statement`
+                `unexpected ${wrongSymbol} in statement`
             );
         }
 
         if (currentRule == "lValueExpression" && stack[1] == "incDecStatement") {
             throw (
                 `Syntax Error (line ${line}, column ${column}): ` +
-                `++, -- can only be applied to an l-value expression`
+                `++, -- can only be used on a variable-addressing expression`
             );
         }
 
@@ -60,8 +64,8 @@ export default class GameMakerParseErrorListener extends ErrorListener {
 
         throw (
             `Syntax Error (line ${line}, column ${column}): ` +
-            `unexpected symbol '${wrongSymbol}'` 
-            + ` while matching ${currentRuleFormatted}`
+            `unexpected ${wrongSymbol}`
+            + `while matching ${currentRuleFormatted}`
         );
     }
 }

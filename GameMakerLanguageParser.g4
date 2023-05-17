@@ -278,7 +278,7 @@ arrayLiteral
     ;
 
 elementList
-    : ','* expression? (','+ expression)* ','* // Yes, everything is optional
+    : ','* expression? (','+ expression)* ','? // Yes, everything is optional
     ;
     
 structLiteral

@@ -4,18 +4,15 @@ import { getLineBreakCount } from './gml-parser.js';
 export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {
     constructor(options) {
         super();
-        this.getLocationInformation = options.getLocationInformation;
     }
 
     // add context data to the node
     astNode(ctx, object) {
-        if (this.getLocationInformation) {
-            object.start = { line: ctx.start.line, index: ctx.start.start };
-            object.end = {
-                line: ctx.stop.line + getLineBreakCount(ctx.stop.text), 
-                index: ctx.stop.stop 
-            };
-        }
+        object.start = { line: ctx.start.line, index: ctx.start.start };
+        object.end = {
+            line: ctx.stop.line + getLineBreakCount(ctx.stop.text),
+            index: ctx.stop.stop
+        };
         return object;
     }
 
@@ -29,6 +26,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
             type: "Program",
             body: body,
         });
+
         return ast;
     }
 
@@ -1013,9 +1011,12 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#arrayLiteral.
     visitArrayLiteral(ctx) {
+        const elemList = ctx.elementList();
+        const hasTrailingComma = elemList.Comma().length === elemList.expression().length;
         return this.astNode(ctx, {
             type: "ArrayExpression",
-            elements: this.visit(ctx.elementList())
+            elements: this.visit(ctx.elementList()),
+            hasTrailingComma: hasTrailingComma
         });
     }
 
@@ -1035,9 +1036,11 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         if (ctx.propertyAssignment().length > 0) {
             properties = this.visit(ctx.propertyAssignment());
         }
+        const hasTrailingComma = ctx.Comma().length === ctx.propertyAssignment().length;
         return this.astNode(ctx, {
             type: "StructExpression",
-            properties: properties
+            properties: properties, 
+            hasTrailingComma: hasTrailingComma
         });
     }
 
@@ -1052,27 +1055,34 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         }
 
         if (ctx.Constructor() != null) {
-            let parentId = null;
-            let parentParams = null;
+            let parent = null;
             if (ctx.identifier()[1] != null) {
-                parentId = this.visit(ctx.identifier()[1]);
-                parentParams = this.visit(ctx.parameterList()[1]);
+                const paramListCtx = ctx.parameterList()[1];
+                const hasTrailingComma = paramListCtx.Comma().length === paramListCtx.parameterArgument().length;
+                parent = {
+                    id: this.visit(ctx.identifier()[1]),
+                    params: this.visit(ctx.parameterList()[1]),
+                    hasTrailingComma: hasTrailingComma
+                }
             }
             return this.astNode(ctx, {
                 type: "ConstructorExpression",
                 id: id,
                 params: params,
-                parentId: parentId,
-                parentParams: parentParams,
+                parentClause: parent,
                 body: this.visit(ctx.statement())
             });
         }
+
+        const paramListCtx = ctx.parameterList()[0];
+        const hasTrailingComma = paramListCtx.Comma().length === paramListCtx.parameterArgument().length;
 
         return this.astNode(ctx, {
             type: "FunctionExpression",
             id: id,
             params: params,
-            body: this.visit(ctx.statement())
+            body: this.visit(ctx.statement()),
+            hasTrailingComma: hasTrailingComma
         });
     }
 
@@ -1120,7 +1130,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#propertyIdentifier.
     visitPropertyIdentifier(ctx) {
-        return this.visitChildren(ctx);
+        return ctx.getText();
     }
 
 
