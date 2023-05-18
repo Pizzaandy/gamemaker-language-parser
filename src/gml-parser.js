@@ -1,10 +1,10 @@
-import antlr4, { Lexer } from 'antlr4';
+import antlr4 from 'antlr4';
 import { PredictionMode } from 'antlr4';
 import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
 import GameMakerLanguageParser from '../Generated/GameMakerLanguageParser.js';
 import GameMakerASTBuilder from './gml-ast-builder.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
-import { attachComments } from './gml-comments.js';
+import { attachComments } from './comments/gml-comments.js';
 
 export default class GMLParser {
     constructor(text, options) {
@@ -65,7 +65,7 @@ export default class GMLParser {
         const builder = new GameMakerASTBuilder(this.options, this.whitespaces);
         let astTree = {};
         astTree = builder.build(tree);
-        attachComments(astTree, this.comments);
+        attachComments(astTree, this.comments, this.text);
 
         if (!this.options.getLocations) {
             this.removeLocationInfo(astTree);
@@ -100,13 +100,16 @@ export default class GMLParser {
         console.log("");
     }
 
-    // populates comments and whitespaces lists
-    // also records any trailing or leading whitespace on comments
+    // populates the comments array and whitespaces array.
+    // comments are annotated with surrounding whitespace and characters
     getHiddenNodes(lexer) {
-        let nodes = [];
         let reachedEOF = false;
         let prevComment = null;
+        let finalComment = null;
         let prevWS = "";
+        let prevSignificantChar = "";
+        let foundFirstSignificantToken = false;
+
         for (
             let token = lexer.nextToken();
             !reachedEOF;
@@ -114,7 +117,9 @@ export default class GMLParser {
         ) {
             if (token.type === GameMakerLanguageLexer.EOF) {
                 reachedEOF = true;
-
+                if (finalComment) {
+                    finalComment.isBottomComment = true;
+                }
             } else if (token.type == GameMakerLanguageLexer.SingleLineComment) {
                 let node = {
                     type: "CommentLine",
@@ -126,8 +131,11 @@ export default class GMLParser {
                     },
                     leadingWS: prevWS,
                     trailingWS: "",
+                    leadingChar: prevSignificantChar,
+                    trailingChar: "",
                 };
                 prevComment = node;
+                finalComment = node;
                 prevWS = "";
                 this.comments.push(node);
 
@@ -142,8 +150,11 @@ export default class GMLParser {
                     },
                     leadingWS: prevWS,
                     trailingWS: "",
+                    leadingChar: prevSignificantChar,
+                    trailingChar: "",
                 };
                 prevComment = node;
+                finalComment = node;
                 prevWS = "";
                 this.comments.push(node);
 
@@ -169,8 +180,19 @@ export default class GMLParser {
                 prevWS += token.text;
 
             } else {
+                // significant token
+                foundFirstSignificantToken = true;
+                if (prevComment !== null) {
+                    prevComment.trailingChar = token.text.slice(0);
+                }
                 prevComment = null;
                 prevWS = "";
+                prevSignificantChar = token.text.slice(-1);
+            }
+
+            if (!foundFirstSignificantToken && prevComment) {
+                prevComment.isTopComment = true;
+                foundFirstSignificantToken = true;
             }
         }
     }

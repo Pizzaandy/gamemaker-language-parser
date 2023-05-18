@@ -257,7 +257,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#caseBlock.
     visitCaseBlock(ctx) {
-        let caseClauses = []
+        let caseClauses = [];
         // yucky
         if (ctx.caseClauses() != null) {
             let cases = ctx.caseClauses();
