@@ -1,8 +1,9 @@
 {
   "name": "prettier-plugin-gamemaker",
   "main": "src/plugin/index.js",
+  "type": "module",
   "dependencies": {
-    "gamemaker-language-parser": "0.0.1",
+    "gamemaker-language-parser": "0.0.5",
     "prettier": "2.8.8"
   },
   "devDependencies": {

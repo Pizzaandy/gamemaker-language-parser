@@ -1,5 +1,5 @@
-import GMLParser from "../../parser/gml-parser";
-import { printAst } from "./print"; 
+import GMLParser from "gamemaker-language-parser";
+import { printAst } from "./print.js";
 
 const languages = [
     {
