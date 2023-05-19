@@ -7,7 +7,7 @@ import antlr4 from 'antlr4';
 export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by GameMakerLanguageParser#program.
-	build(ctx) {
+	visitProgram(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
