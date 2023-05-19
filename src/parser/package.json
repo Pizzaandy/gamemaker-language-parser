@@ -1,0 +1,10 @@
+{
+  "name": "gamemaker-language-parser",
+  "version": "0.0.1",
+  "dependencies": {
+    "antlr4": "^4.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.3"
+  }
+}
