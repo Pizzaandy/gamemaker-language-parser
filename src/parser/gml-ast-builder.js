@@ -1,4 +1,4 @@
-import GameMakerLanguageParserVisitor from '../Generated/GameMakerLanguageParserVisitor.js';
+import GameMakerLanguageParserVisitor from '../generated/GameMakerLanguageParserVisitor.js';
 import { getLineBreakCount } from './gml-parser.js';
 
 export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor {

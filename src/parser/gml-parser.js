@@ -1,7 +1,7 @@
 import antlr4 from 'antlr4';
 import { PredictionMode } from 'antlr4';
-import GameMakerLanguageLexer from '../Generated/GameMakerLanguageLexer.js';
-import GameMakerLanguageParser from '../Generated/GameMakerLanguageParser.js';
+import GameMakerLanguageLexer from '../generated/GameMakerLanguageLexer.js';
+import GameMakerLanguageParser from '../generated/GameMakerLanguageParser.js';
 import GameMakerASTBuilder from './gml-ast-builder.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
 import { attachComments } from './comments/gml-comments.js';
