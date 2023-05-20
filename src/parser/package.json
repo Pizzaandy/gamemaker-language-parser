@@ -1,6 +1,6 @@
 {
   "name": "gamemaker-language-parser",
-  "version": "0.0.5",
+  "version": "0.0.1",
   "main": "gml-parser.js",
   "type": "module",
   "dependencies": {

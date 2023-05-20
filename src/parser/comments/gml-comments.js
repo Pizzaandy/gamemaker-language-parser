@@ -5,7 +5,7 @@ import {
     hasNewline,
 } from './utils.js'
 
-// walk the ast and return all 
+// get all child nodes associated with this node
 function getSortedChildNodes(node) {
     const children = [];
     const isObject = (object) => object !== null && typeof object === "object";

@@ -15,7 +15,8 @@ export default class GMLParser {
     }
 
     static optionDefaults = {
-        handleComments: true,
+        getComments: true,
+        attachComments: false,
         getLocations: true,
         simplifyLocations: true,
     }
@@ -23,7 +24,8 @@ export default class GMLParser {
     static parse(
         text,
         options = {
-            handleComments: true,
+            getComments: true,
+            attachComments: false,
             getLocations: true,
             simplifyLocations: true
         }
@@ -32,20 +34,16 @@ export default class GMLParser {
     }
 
     parse() {
-        console.time("lexing");
         const chars = new antlr4.InputStream(this.text);
         const lexer = new GameMakerLanguageLexer(chars);
         lexer.strictMode = false;
         const tokens = new antlr4.CommonTokenStream(lexer);
         const parser = new GameMakerLanguageParser(tokens);
 
-        console.timeEnd("lexing");
-
         parser._interp.predictionMode = PredictionMode.SLL;
         parser.removeErrorListeners();
         parser.addErrorListener(new GameMakerParseErrorListener());
 
-        console.time("PARSING");
         try {
             var tree = parser.program();
         } catch (error) {
@@ -53,11 +51,8 @@ export default class GMLParser {
             console.timeEnd();
             return null;
         }
-        console.timeEnd("PARSING");
 
-        console.time("building ast");
-
-        if (this.options.handleComments) {
+        if (this.options.getComments) {
             lexer.reset();
             this.getHiddenNodes(lexer);
         }
@@ -65,15 +60,18 @@ export default class GMLParser {
         const builder = new GameMakerASTBuilder(this.options, this.whitespaces);
         let astTree = {};
         astTree = builder.build(tree);
-        attachComments(astTree, this.comments, this.text);
+
+        if (this.options.attachComments) {
+            attachComments(astTree, this.comments, this.text);
+        } else {
+            astTree.comments = this.comments;
+        }
 
         if (!this.options.getLocations) {
             this.removeLocationInfo(astTree);
         } else if (this.options.simplifyLocations) {
             this.simplifyLocationInfo(astTree);
         }
-
-        console.timeEnd("building ast");
 
         return astTree;
     }
@@ -148,6 +146,7 @@ export default class GMLParser {
                         line: token.line + getLineBreakCount(token.text),
                         index: token.stop
                     },
+                    lineCount: getLineBreakCount(token.text) + 1,
                     leadingWS: prevWS,
                     trailingWS: "",
                     leadingChar: prevSignificantChar,

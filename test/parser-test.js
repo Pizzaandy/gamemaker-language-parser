@@ -5,10 +5,10 @@ import clipboardy from 'clipboardy';
 const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = `a()
-    .b()
-    .c() //comment???
-    .d()`;
+input = `if (foo()) 
+baz();
+
+`;
 
 console.time("total");
 const ast = GMLParser.parse(input, {getLocations: false});

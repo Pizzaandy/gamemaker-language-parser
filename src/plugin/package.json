@@ -1,10 +1,13 @@
 {
   "name": "prettier-plugin-gamemaker",
-  "main": "src/plugin/index.js",
+  "main": "src/gml.js",
   "type": "module",
+  "scripts": {
+    "example": "prettier --plugin ./src/gml.js example.gml"
+  },
   "dependencies": {
-    "gamemaker-language-parser": "0.0.5",
-    "prettier": "2.8.8"
+    "gamemaker-language-parser": "0.0.1",
+    "prettier": "3.0.0-alpha.11"
   },
   "devDependencies": {
     "@types/node": "^18.16.3"

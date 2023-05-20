@@ -462,10 +462,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#IdentifierLValue.
     visitIdentifierLValue(ctx) {
-        return this.astNode(ctx, {
-            type: "Identifier",
-            name: this.visit(ctx.identifier())
-        });
+        return this.visit(ctx.identifier());
     }
 
 
@@ -1136,14 +1133,8 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#identifier.
     visitIdentifier(ctx) {
-        let name = ""
-        if (ctx.Identifier() != null) {
-            name = ctx.Identifier().getText();
-        } else {
-            name = this.visit(ctx.softKeyword());
-        }
         return this.astNode(ctx, {
-            type: "Identifier", name: name
+            type: "Identifier", name: ctx.getText()
         });
     }
 
