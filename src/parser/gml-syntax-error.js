@@ -21,20 +21,14 @@ export default class GameMakerParseErrorListener extends ErrorListener {
 
         const currentRule = stack[0];
 
-        if (currentRule == "block") {
-            const openBraceToken = parser._ctx.openBlock().start;
-            throw (
-                `Syntax Error (line ${openBraceToken.line}, column ${openBraceToken.column}): ` +
-                `missing closing brace for this block`
-            );
-        }
-
         if (currentRule == "closeBlock") {
             const openBraceToken = parser._ctx.parentCtx.openBlock().start;
-            throw (
-                `Syntax Error (line ${openBraceToken.line}, column ${openBraceToken.column}): ` +
-                `missing closing brace for this block`
-            );
+            if (stack[1] === "block") {
+                throw (
+                    `Syntax Error (line ${openBraceToken.line}, column ${openBraceToken.column}): ` +
+                    `missing associated closing brace for this block`
+                );
+            }
         }
 
         if (currentRule == "expression") {
@@ -47,7 +41,7 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         if (currentRule == "statement") {
             throw (
                 `Syntax Error (line ${line}, column ${column}): ` +
-                `unexpected ${wrongSymbol} in statement`
+                `unexpected ${wrongSymbol}`
             );
         }
 
@@ -58,6 +52,14 @@ export default class GameMakerParseErrorListener extends ErrorListener {
             );
         }
 
+        // *refuses to elaborate further*
+        if (currentRule === "program") {
+            throw (
+                `Syntax Error (line ${line}, column ${column}): ` +
+                `unexpected ${wrongSymbol}`
+            );
+        }
+
         const currentRuleFormatted = currentRule
             .replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
             .toLowerCase();
@@ -65,7 +67,7 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         throw (
             `Syntax Error (line ${line}, column ${column}): ` +
             `unexpected ${wrongSymbol}`
-            + `while matching ${currentRuleFormatted}`
+            + ` while matching ${currentRuleFormatted}`
         );
     }
 }

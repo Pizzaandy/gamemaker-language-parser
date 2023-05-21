@@ -5,13 +5,11 @@ import clipboardy from 'clipboardy';
 const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = `if (foo()) 
-baz();
-
+input = `a[1]
 `;
 
 console.time("total");
-const ast = GMLParser.parse(input, {getLocations: false});
+const ast = GMLParser.parse(input, {getLocations: true});
 console.timeEnd("total");
 
 const astText = JSON.stringify(ast, null, 3);

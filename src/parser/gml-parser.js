@@ -48,7 +48,6 @@ export default class GMLParser {
             var tree = parser.program();
         } catch (error) {
             console.error(error);
-            console.timeEnd();
             return null;
         }
 

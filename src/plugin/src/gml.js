@@ -1,5 +1,6 @@
 import GMLParser from "../../parser/gml-parser.js";
-import { print, printComment } from "./printer/print.js";
+import { print } from "./printer/print.js";
+import { handleComments, printComment } from "./printer/comments.js";
 
 export const languages = [
     {
@@ -17,16 +18,17 @@ export const parsers = {
         }),
         astFormat: 'gml-ast',
         locStart: (node) => node.start.index,
-        locEnd: (node) => node.end.index
+        locEnd: (node) => node.end.index + 1
     }
 }
 
 export const printers = {
     'gml-ast': {
         print: print,
-        printComment: printComment,
         isBlockComment: (comment) => comment.type === "CommentBlock",
-        canAttachComment: (node) => node.type && !node.type.includes("Comment"),
+        canAttachComment: (node) => node.type && !node.type.includes("Comment") && node.type !== "EmptyStatement",
+        printComment: printComment,
+        handleComments: handleComments
     }
 }
 

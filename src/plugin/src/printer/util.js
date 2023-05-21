@@ -9,7 +9,7 @@ const {
     hasNewline
 } = util;
 
-function lineShouldEndWithSemicolon(path) {
+function statementShouldEndWithSemicolon(path) {
     const node = path.getValue();
     const parentNode = path.getParentNode();
     if (!parentNode) {
@@ -28,10 +28,10 @@ function lineShouldEndWithSemicolon(path) {
     ) {
         return true;
     }
-    return nodeHasStatement(node);
+    return nodeTypeNeedsSemicolon(node.type);
 }
 
-function nodeHasStatement(node) {
+function nodeTypeNeedsSemicolon(type) {
     return [
         "CallExpression",
         "AssignmentExpression",
@@ -42,10 +42,9 @@ function nodeHasStatement(node) {
         "ContinueStatement",
         "ExitStatement",
         "ThrowStatement",
-        "ForStatement",
         "IncDecStatement",
         "VariableDeclaration",
-    ].includes(node.type);
+    ].includes(type);
 }
 
 function isLastStatement(path) {
@@ -66,10 +65,9 @@ function getParentNodeListProperty(path) {
 }
 
 function getNodeListProperty(node) {
-    const body = node.children || node.body || node.adaptations;
+    const body = node.body;
     return Array.isArray(body) ? body : null;
 }
-
 
 function isNextLineEmpty(text, startIndex) {
     let oldIdx = null;
@@ -86,8 +84,29 @@ function isNextLineEmpty(text, startIndex) {
     return idx !== false && hasNewline(text, idx);
 }
 
+function optionalSemicolon(nodeType) {
+    return nodeTypeNeedsSemicolon(nodeType) ? ";" : "";
+}
+
+function isAssignmentLikeExpression(nodeType) {
+    if (!nodeType) { return false; }
+    return [
+        "AssignmentExpression",
+        "GlobalVarStatement",
+        "VariableDeclarator",
+    ].includes(nodeType);
+}
+
+function hasComment(node) {
+    const comments = node.comments ?? null;
+    return comments && Array.isArray(comments) && comments.length > 0;
+}
+
 export {
-    lineShouldEndWithSemicolon,
+    statementShouldEndWithSemicolon,
     isLastStatement,
     isNextLineEmpty,
+    optionalSemicolon,
+    isAssignmentLikeExpression,
+    hasComment
 }
