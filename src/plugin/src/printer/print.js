@@ -21,14 +21,16 @@ const {
 } = builders;
 
 import {
-    statementShouldEndWithSemicolon,
     isLastStatement,
     isNextLineEmpty,
     optionalSemicolon,
     isAssignmentLikeExpression,
 } from "./util.js";
 
-import { printDanglingComments } from "./comments.js";
+import {
+    printDanglingComments,
+    printDanglingCommentsAsGroup,
+} from "./comments.js";
 
 export function print(path, options, print) {
     const node = path.getValue();
@@ -50,45 +52,7 @@ export function print(path, options, print) {
         }
         case "BlockStatement": {
             if (node.body.length === 0) {
-                if (node?.comments?.length > 0) {
-                    // an empty block with comments
-                    return [
-                        "{",
-                        printDanglingComments(
-                            path,
-                            options,
-                            true,
-                            (comment) => comment.attachToBrace
-                        ),
-                        indent([
-                            hardline,
-                            join(
-                                hardline,
-                                printDanglingComments(
-                                    path,
-                                    options,
-                                    true,
-                                    (comment) => !comment.attachToBrace
-                                )
-                            ),
-                        ]),
-                        hardline,
-                        "}",
-                    ];
-                } else {
-                    // empty braces
-                    let emptyBlockText = "\n";
-                    if (
-                        (path.grandparent &&
-                            isAssignmentLikeExpression(
-                                path.grandparent.type
-                            )) ||
-                        path.parent.type == "Program"
-                    ) {
-                        emptyBlockText = "";
-                    }
-                    return ["{", emptyBlockText, "}"];
-                }
+                return printEmptyBlock(path, options, print);
             }
 
             return [
@@ -110,7 +74,7 @@ export function print(path, options, print) {
         case "IfStatement": {
             const parts = [];
             parts.push(
-                printStatementWithClause(path, options, print, "if", "test", "consequent")
+                printSingleClauseStatement(path, options, print, "if", "test", "consequent")
             );
 
             if (node.alternate != null) {
@@ -126,6 +90,17 @@ export function print(path, options, print) {
             }
             return parts;
         }
+        case "TernaryExpression": {
+            return group([
+                print("test"),
+                indent([
+                    line,
+                    "? ", print("consequent"),
+                    line,
+                    ": ", print("alternate")
+                ]),
+            ]);
+        }
         case "ForStatement": {
             return [
                 "for (",
@@ -140,14 +115,23 @@ export function print(path, options, print) {
                 printInBlock(path, options, print, "body"),
             ];
         }
+        case "DoUntilStatement": {
+            return [
+                "do ",
+                printInBlock(path, options, print, "body"),
+                " until (",
+                group([indent([ifBreak(line), print("test")]), ifBreak(line)]),
+                ") ",
+            ]
+        }
         case "WhileStatement": {
-            return printStatementWithClause(path, options, print, "while", "test", "body");
+            return printSingleClauseStatement(path, options, print, "while", "test", "body");
         }
         case "RepeatStatement": {
-            return printStatementWithClause(path, options, print, "repeat", "test", "body");
+            return printSingleClauseStatement(path, options, print, "repeat", "test", "body");
         }
         case "WithStatement": {
-            return printStatementWithClause(path, options, print, "with", "test", "body");
+            return printSingleClauseStatement(path, options, print, "with", "test", "body");
         }
         case "FunctionExpression": {
             const parts = [];
@@ -161,11 +145,7 @@ export function print(path, options, print) {
                     })
                 );
             } else {
-                parts.push([
-                    "(",
-                    printDanglingComments(path, options, true),
-                    ")",
-                ]);
+                parts.push([printEmptyParens(path, print, options)]);
             }
             parts.push(" ");
             parts.push(printInBlock(path, options, print, "body"));
@@ -202,20 +182,25 @@ export function print(path, options, print) {
             return printSimpleDeclaration(print("id"), print("init"));
         }
         case "CallExpression": {
-            return [
-                print("object"),
-                printDelimitedList(path, print, "arguments", "(", ")", {
-                    delimiter: ",",
-                    allowTrailingDelimiter: false,
-                }),
-            ];
+            const parts = [print("object")];
+            if (node.arguments.length === 0) {
+                parts.push(printEmptyParens(path, print, options));
+            } else {
+                parts.push(
+                    printDelimitedList(path, print, "arguments", "(", ")", {
+                        delimiter: ",",
+                        allowTrailingDelimiter: false,
+                    })
+                )
+            }
+            return parts;
         }
         case "BinaryExpression": {
             return group([
                 print("left"),
                 " ",
                 node.operator,
-                line,
+                " ",
                 print("right"),
             ]);
         }
@@ -262,12 +247,37 @@ export function print(path, options, print) {
                 "]",
             ];
         }
+        case "StructExpression": {
+            if (node.properties.length === 0) {
+                return printEmptyBlock(path, options, print);
+            }
+            return printDelimitedList(path, print, "properties", "{", "}", {
+                delimiter: ",",
+                allowTrailingDelimiter: true,
+                forceBreak: node.hasTrailingComma,
+                padding: " "
+            });
+        }
+        case "Property": {
+            return [print("name"), ": ", print("value")];
+        }
         case "ArrayExpression": {
             return printDelimitedList(path, print, "elements", "[", "]", {
                 delimiter: ",",
                 allowTrailingDelimiter: true,
                 forceBreak: node.hasTrailingComma,
             });
+        }
+        case "EnumDeclaration": {
+            return [
+                "enum ",
+                printDelimitedList(path, print, "members", "{", "}", {
+                    delimiter: ",",
+                    allowTrailingDelimiter: true,
+                    forceBreak: node.hasTrailingComma,
+                    padding: " "
+                }),
+            ];
         }
         case "ReturnStatement": {
             if (node.argument) {
@@ -282,6 +292,19 @@ export function print(path, options, print) {
             } else {
                 return "throw";
             }
+        }
+        case "MacroDeclaration": {
+            // can't touch this
+            return options.originalText.slice(node.start.index, node.end.index + 1);
+        }
+        case "RegionStatement": {
+            return ["#region", print("name")];
+        }
+        case "EndRegionStatement": {
+            return ["#endregion", print("name")];
+        }
+        case "DefineStatement": {
+            return ["#define", print("name")];
         }
         case "DeleteStatement": {
             return ["delete ", print("argument")];
@@ -319,22 +342,27 @@ function printDelimitedList(
         leadingNewline = true,
         trailingNewline = true,
         forceBreak = false,
+        padding = ""
     } = delimiterOptions
 ) {
     const lineBreak = forceBreak ? hardline : line;
     const finalDelimiter = allowTrailingDelimiter ? delimiter : "";
-    return group([
+
+    const printed = group([
         startChar,
         indent([
-            ifBreak(leadingNewline ? lineBreak : ""),
-            join([delimiter, lineBreak], path.map(print, listKey)),
+            ifBreak(leadingNewline ? lineBreak : "", padding),
+            printElements(path, print, listKey, delimiter, lineBreak),
         ]),
-        ifBreak([finalDelimiter, trailingNewline ? lineBreak : ""]),
+        // always print a trailing delimiter if the list breaks
+        ifBreak([finalDelimiter, trailingNewline ? lineBreak : ""], padding),
         endChar,
     ]);
+
+    return printed;
 }
 
-// wrap a statement in a block if not already in a block
+// wrap a statement in a block if it's not already a block
 function printInBlock(path, options, print, expressionKey) {
     const node = path.getValue()[expressionKey];
     if (node.type !== "BlockStatement") {
@@ -353,6 +381,33 @@ function printInBlock(path, options, print, expressionKey) {
     }
 }
 
+// print a delimited sequence of elements
+// handles the case where a trailing comment follows a delimiter
+function printElements(path, print, listKey, delimiter, lineBreak) {
+    const node = path.getValue();
+    const finalIndex = node[listKey].length - 1;
+    return path.map((childPath, index) => {
+        const parts = [];
+        const printed = print();
+        const separator = (index !== finalIndex) ? delimiter : "";
+
+        if (docHasTrailingComment(printed)) {
+            printed.splice(printed.length - 1, 0, separator);
+            parts.push(printed);
+        } else {
+            parts.push(printed);
+            parts.push(separator);
+        }
+
+        if (index !== finalIndex) {
+            parts.push(lineBreak);
+        }
+
+        return parts;
+    }, listKey);
+}
+
+// variation of printElements that handles semicolons and line breaks in a program or block
 function printStatements(path, options, print, childrenAttribute) {
     return path.map((childPath) => {
         const parts = [];
@@ -380,15 +435,6 @@ function printStatements(path, options, print, childrenAttribute) {
     }, childrenAttribute);
 }
 
-function printStatementWithClause(path, options, print, keyword, clauseKey, bodyKey) {
-    return [
-        `${keyword} (`,
-        group([indent([ifBreak(line), print(clauseKey)]), ifBreak(line)]),
-        ") ",
-        printInBlock(path, options, print, bodyKey),
-    ]
-}
-
 function docHasTrailingComment(doc) {
     if (Array.isArray(doc) && doc.length > 0) {
         const lastItem = doc[doc.length - 1];
@@ -407,6 +453,69 @@ function docHasTrailingComment(doc) {
     return false;
 }
 
+// prints any statement that matches the structure [keyword, clause, statement]
+function printSingleClauseStatement(path, options, print, keyword, clauseKey, bodyKey) {
+    return [
+        `${keyword} (`,
+        group([indent([ifBreak(line), print(clauseKey)]), ifBreak(line)]),
+        ") ",
+        printInBlock(path, options, print, bodyKey),
+    ]
+}
+
 function printSimpleDeclaration(leftDoc, rightDoc) {
     return rightDoc ? [leftDoc, " = ", rightDoc] : leftDoc;
+}
+
+// prints empty parens with dangling comments
+function printEmptyParens(path, options, print) {
+    const printed = group([
+        "(",
+        indent([
+            printDanglingCommentsAsGroup(
+                path,
+                options,
+                true,
+                (comment) => !comment.attachToBrace
+            )
+        ]),
+        ifBreak(line),
+        ")"
+    ]);
+    return printed;
+}
+
+// prints an empty block with dangling comments
+function printEmptyBlock(path, options, print) {
+    const node = path.getValue();
+    if (node?.comments?.length > 0) {
+        // an empty block with comments
+        return [
+            "{",
+            printDanglingComments(
+                path,
+                options,
+                true,
+                (comment) => comment.attachToBrace
+            ),
+            printDanglingCommentsAsGroup(
+                path,
+                options,
+                true,
+                (comment) => !comment.attachToBrace
+            ),
+            "}",
+        ];
+    } else {
+        // a plain old empty block
+        // only add a newline if the function is being used as an expression
+        let emptyBlockText = "\n";
+        if (
+            (path.grandparent && isAssignmentLikeExpression(path.grandparent.type)) ||
+            path.parent.type == "Program"
+        ) {
+            emptyBlockText = "";
+        }
+        return ["{", emptyBlockText, "}"];
+    }
 }

@@ -9,6 +9,7 @@ const {
     hasNewline
 } = util;
 
+// currently unused due to enforcement of braces
 function statementShouldEndWithSemicolon(path) {
     const node = path.getValue();
     const parentNode = path.getParentNode();
@@ -16,7 +17,7 @@ function statementShouldEndWithSemicolon(path) {
         return false;
     }
 
-    // for single line control structures written in a shortform (ie without a block),
+    // for single line control structures written in short form (i.e. without a block),
     // we need to make sure the single body node gets a semicolon
     if (
         ["ForStatement", "WhileStatement", "DoUntilStatement", "IfStatement", "SwitchStatement"].includes(
@@ -94,6 +95,7 @@ function isAssignmentLikeExpression(nodeType) {
         "AssignmentExpression",
         "GlobalVarStatement",
         "VariableDeclarator",
+        "Property",
     ].includes(nodeType);
 }
 

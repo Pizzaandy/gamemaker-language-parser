@@ -36,6 +36,14 @@ const handleComments = {
                 ast,
                 isLastComment
             ) ||
+            handleCommentInEmptyParens(
+                comment,
+                text,
+                options,
+                ast,
+                isLastComment
+            ) ||
+            handleMacroComments(comment) ||
             false
         );
     },
@@ -56,6 +64,14 @@ const handleComments = {
                 ast,
                 isLastComment
             ) ||
+            handleCommentInEmptyLiteral(
+                comment,
+                text,
+                options,
+                ast,
+                isLastComment
+            ) ||
+            handleMacroComments(comment) ||
             false
         );
     },
@@ -105,12 +121,53 @@ function printDanglingComments(path, options, sameIndent, filter) {
         return "";
     }
 
-    if (parts[parts.length - 1] === hardline) {
-        parts.pop();
+    return parts;
+}
+
+// print dangling comments and preserve the whitespace around the comments.
+// this function behaves similarly to the default comment algorithm.
+function printDanglingCommentsAsGroup(path, options, sameIndent, filter) {
+    const parts = [];
+    const node = path.getValue();
+
+    if (!node || !node.comments) {
+        return "";
+    }
+
+    let i = 0;
+    const finalIndex = node.comments.length - 1;
+
+    path.each((commentPath) => {
+        const comment = commentPath.getValue();
+        if (
+            comment &&
+            !comment.leading &&
+            !comment.trailing &&
+            (!filter || filter(comment))
+        ) {
+            if (i === 0) {
+                parts.push(whitespaceToDoc(comment.leadingWS));
+            }
+            parts.push([printComment(commentPath, options)]);
+            if (i !== finalIndex) {
+                let wsDoc = whitespaceToDoc(comment.trailingWS);
+                // enforce at least one space between comments
+                if (wsDoc === "") {
+                    wsDoc = " ";
+                }
+                parts.push(wsDoc);
+            }
+            i += 1;
+        }
+    }, "comments");
+
+    if (parts.length === 0) {
+        return "";
     }
 
     return parts;
 }
+
 
 function handleCommentInEmptyBody(comment, text, options, ast, isLastComment) {
     if (
@@ -124,6 +181,16 @@ function handleCommentInEmptyBody(comment, text, options, ast, isLastComment) {
     return false;
 }
 
+function handleMacroComments(comment) {
+    if (
+        comment.enclosingNode?.type === "MacroDeclaration"
+    ) {
+        comment.printed = true;
+        return true;
+    }
+    return false;
+}
+
 function handleCommentAttachedToOpenBrace(
     comment,
     text,
@@ -131,7 +198,9 @@ function handleCommentAttachedToOpenBrace(
     ast,
     isLastComment
 ) {
-    if (comment.enclosingNode?.type === "BlockStatement") {
+    if (
+        comment.enclosingNode?.type === "BlockStatement"
+    ) {
         // if a comment is enclosed in a block statement and starts on the same line,
         // it is considered "attached" to the opening brace.
         if (comment.start.line === comment.enclosingNode.start.line) {
@@ -169,6 +238,40 @@ function handleCommentInEmptyParens(
     return false;
 }
 
+function handleCommentInEmptyLiteral(
+    comment,
+    text,
+    options,
+    ast,
+    isLastComment
+) {
+    if (
+        comment.enclosingNode?.type === "ArrayExpression" &&
+        comment.enclosingNode?.elements.length === 0
+    ) {
+        addDanglingComment(comment.enclosingNode, comment);
+        return true;
+    }
+
+    if (
+        comment.enclosingNode?.type === "StructExpression" &&
+        comment.enclosingNode?.properties.length === 0
+    ) {
+        addDanglingComment(comment.enclosingNode, comment);
+        return true;
+    }
+
+    if (
+        comment.enclosingNode?.type === "EnumDeclaration" &&
+        comment.enclosingNode?.members.length === 0
+    ) {
+        addDanglingComment(comment.enclosingNode, comment);
+        return true;
+    }
+
+    return false;
+}
+
 function handleOnlyComments(comment, text, options, ast, isLastComment) {
     const { enclosingNode, followingNode } = comment;
 
@@ -194,4 +297,19 @@ function getLineBreakCount(text) {
     return text.split(/[\r\n\u2028\u2029]/).length - 1;
 }
 
-export { printDanglingComments, handleComments, printComment };
+// note: this preserves non-standard whitespaces!
+function whitespaceToDoc(text) {
+    const lines = text.split(/[\r\n\u2028\u2029]/);
+    if (lines.length === 1) {
+        return lines[0];
+    } else {
+        return join(hardline, lines);
+    }
+}
+
+export {
+    printDanglingComments,
+    printDanglingCommentsAsGroup,
+    handleComments,
+    printComment,
+};

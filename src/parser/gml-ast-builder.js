@@ -525,7 +525,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
     // Visit a parse tree produced by GameMakerLanguageParser#TernaryExpression.
     visitTernaryExpression(ctx) {
         return this.astNode(ctx, {
-            type: "ConditionalExpression",
+            type: "TernaryExpression",
             test: this.visit(ctx.expression()[0]),
             consequent: this.visit(ctx.expression()[1]),
             alternate: this.visit(ctx.expression()[2]),
@@ -974,7 +974,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
             properties = this.visit(ctx.propertyAssignment());
         }
         const hasTrailingComma = this.hasTrailingComma(
-            ctx.Comma() === ctx.propertyAssignment()
+            ctx.Comma(), ctx.propertyAssignment()
         );
         return this.astNode(ctx, {
             type: "StructExpression",
@@ -1007,7 +1007,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
                 };
             }
             return this.astNode(ctx, {
-                type: "ConstructorExpression",
+                type: "ConstructorDeclaration",
                 id: id,
                 params: params,
                 parentClause: parent,
@@ -1119,9 +1119,6 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#macroStatement.
     visitMacroToken(ctx) {
-        if (ctx.EscapedNewLine() != null) {
-            return "\n";
-        }
         return ctx.getText();
     }
 

@@ -5,8 +5,9 @@ import clipboardy from 'clipboardy';
 const fp = 'test/input/loungeware.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = `a[1]
-`;
+input = `#macro name someexpression[|] \\
+anotherpartofthemacro \\//cumment
+thing // comment`;
 
 console.time("total");
 const ast = GMLParser.parse(input, {getLocations: true});
