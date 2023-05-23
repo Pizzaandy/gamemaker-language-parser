@@ -4,7 +4,6 @@ import GameMakerLanguageLexer from './generated/GameMakerLanguageLexer.js';
 import GameMakerLanguageParser from './generated/GameMakerLanguageParser.js';
 import GameMakerASTBuilder from './gml-ast-builder.js';
 import GameMakerParseErrorListener from './gml-syntax-error.js';
-import { attachComments } from './comments/gml-comments.js';
 
 export default class GMLParser {
     constructor(text, options) {
@@ -16,7 +15,6 @@ export default class GMLParser {
 
     static optionDefaults = {
         getComments: true,
-        attachComments: false,
         getLocations: true,
         simplifyLocations: true,
     }
@@ -25,7 +23,6 @@ export default class GMLParser {
         text,
         options = {
             getComments: true,
-            attachComments: false,
             getLocations: true,
             simplifyLocations: true
         }
@@ -60,9 +57,7 @@ export default class GMLParser {
         let astTree = {};
         astTree = builder.build(tree);
 
-        if (this.options.attachComments) {
-            attachComments(astTree, this.comments, this.text);
-        } else {
+        if (this.options.getComments) {
             astTree.comments = this.comments;
         }
 

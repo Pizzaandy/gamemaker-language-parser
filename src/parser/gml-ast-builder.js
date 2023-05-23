@@ -286,7 +286,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         return this.astNode(ctx, {
             type: "SwitchCase",
             test: this.visit(ctx.expression()),
-            consequent: consequent,
+            body: consequent,
         });
     }
 
@@ -299,7 +299,7 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         return this.astNode(ctx, {
             type: "SwitchCase",
             test: null,
-            consequent: consequent,
+            body: consequent,
         });
     }
 

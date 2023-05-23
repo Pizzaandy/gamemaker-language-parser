@@ -1,4 +1,5 @@
 import { builders } from "prettier/doc";
+import { util } from "prettier";
 
 const {
     breakParent,
@@ -22,9 +23,10 @@ const {
 
 import {
     isLastStatement,
-    isNextLineEmpty,
     optionalSemicolon,
     isAssignmentLikeExpression,
+    isNextLineEmpty,
+    shouldAddNewlinesAroundStatement
 } from "./util.js";
 
 import {
@@ -86,6 +88,40 @@ export function print(path, options, print) {
                 parts.push([
                     " else ",
                     elseBlock,
+                ]);
+            }
+            return parts;
+        }
+        case "SwitchStatement": {
+            const parts = [];
+            parts.push([
+                "switch (",
+                group([indent([ifBreak(line), print("discriminant")]), ifBreak(line)]),
+                ") "
+            ]);
+            if (node.cases.length === 0) {
+                parts.push(printEmptyBlock(path, options, print));
+            } else {
+                parts.push([
+                    "{",
+                    indent([
+                        path.map(print, "cases")
+                    ]),
+                    hardline,
+                    "}",
+                ]);
+            }
+            return parts;
+        }
+        case "SwitchCase": {
+            const caseText = node.test !== null ? "case " : "default";
+            const parts = [[hardline, caseText, print("test"), ":"]];
+            if (node.consequent !== null) {
+                parts.push([
+                    indent([
+                        hardline,
+                        printStatements(path, options, print, "body")
+                    ]),
                 ]);
             }
             return parts;
@@ -155,14 +191,11 @@ export function print(path, options, print) {
             return printSimpleDeclaration(print("left"), print("right"));
         }
         case "AssignmentExpression": {
-            const groupId = Symbol("assignment");
             return group([
                 group(print("left")),
                 " ",
                 node.operator,
-                group(indent(line), { id: groupId }),
-                lineSuffixBoundary,
-                indentIfBreak(print("right"), { groupId }),
+                group(indent([line, print("right")])),
             ]);
         }
         case "GlobalVarStatement":
@@ -199,10 +232,8 @@ export function print(path, options, print) {
             return group([
                 print("left"),
                 " ",
-                node.operator,
-                " ",
-                print("right"),
-            ]);
+                group([node.operator, line, print("right")])
+            ])
         }
         case "IncDecStatement":
         case "UnaryExpression": {
@@ -255,7 +286,8 @@ export function print(path, options, print) {
                 delimiter: ",",
                 allowTrailingDelimiter: true,
                 forceBreak: node.hasTrailingComma,
-                padding: " "
+                // TODO: decide whether to add bracket spacing for struct expressions 
+                padding: "" 
             });
         }
         case "Property": {
@@ -275,7 +307,7 @@ export function print(path, options, print) {
                     delimiter: ",",
                     allowTrailingDelimiter: true,
                     forceBreak: node.hasTrailingComma,
-                    padding: " "
+                    //padding: " "
                 }),
             ];
         }
@@ -409,9 +441,10 @@ function printElements(path, print, listKey, delimiter, lineBreak) {
 
 // variation of printElements that handles semicolons and line breaks in a program or block
 function printStatements(path, options, print, childrenAttribute) {
-    return path.map((childPath) => {
+    return path.map((childPath, index) => {
         const parts = [];
         const node = childPath.getValue();
+        const isTopLevel = childPath.parent?.type === "Program";
 
         const printed = print();
         const semi = optionalSemicolon(node.type);
@@ -426,9 +459,11 @@ function printStatements(path, options, print, childrenAttribute) {
 
         if (!isLastStatement(childPath)) {
             parts.push(hardline);
-            if (isNextLineEmpty(options.originalText, node, options)) {
+            if (isNextLineEmpty(options.originalText, node.end.index + 1)) {
                 parts.push(hardline);
             }
+        } else if (isTopLevel) {
+            parts.push(hardline);
         }
 
         return parts;
@@ -456,7 +491,7 @@ function docHasTrailingComment(doc) {
 // prints any statement that matches the structure [keyword, clause, statement]
 function printSingleClauseStatement(path, options, print, keyword, clauseKey, bodyKey) {
     return [
-        `${keyword} (`,
+        keyword, " (",
         group([indent([ifBreak(line), print(clauseKey)]), ifBreak(line)]),
         ") ",
         printInBlock(path, options, print, bodyKey),
@@ -507,15 +542,6 @@ function printEmptyBlock(path, options, print) {
             "}",
         ];
     } else {
-        // a plain old empty block
-        // only add a newline if the function is being used as an expression
-        let emptyBlockText = "\n";
-        if (
-            (path.grandparent && isAssignmentLikeExpression(path.grandparent.type)) ||
-            path.parent.type == "Program"
-        ) {
-            emptyBlockText = "";
-        }
-        return ["{", emptyBlockText, "}"];
+        return "{}";
     }
 }

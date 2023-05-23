@@ -99,6 +99,21 @@ function isAssignmentLikeExpression(nodeType) {
     ].includes(nodeType);
 }
 
+// these top-level statements are surrounded by empty lines by default
+function shouldAddNewlinesAroundStatement(node) {
+    const nodeType = node?.type;
+    if (!nodeType) { return false; }
+    if (
+        [
+            "FunctionExpression",
+            "ConstructorDeclaration",
+        ].includes(nodeType)
+    ) {
+        return true;
+    }
+    return false;
+}
+
 function hasComment(node) {
     const comments = node.comments ?? null;
     return comments && Array.isArray(comments) && comments.length > 0;
@@ -107,8 +122,9 @@ function hasComment(node) {
 export {
     statementShouldEndWithSemicolon,
     isLastStatement,
-    isNextLineEmpty,
     optionalSemicolon,
     isAssignmentLikeExpression,
-    hasComment
+    hasComment,
+    isNextLineEmpty,
+    shouldAddNewlinesAroundStatement
 }

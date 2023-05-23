@@ -1,3 +1,15 @@
-currentEstimate =
-    calc(currentEstimate + x * currentEstimate) /
-        2.00000000000000000000000000;
+a()
+b()
+function d() { // comment
+// comment
+foo()
+}
+
+
+function e() {}
+function f() {}
+
+
+
+c()
+d()

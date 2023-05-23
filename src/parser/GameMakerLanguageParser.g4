@@ -56,11 +56,11 @@ iterationStatement
     ;
     
 withStatement
-    : With '(' expression ')' statement
+    : With expression statement
     ;
     
 switchStatement
-    : Switch '(' expression ')' caseBlock
+    : Switch expression caseBlock
     ;
     
 continueStatement
