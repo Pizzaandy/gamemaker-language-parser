@@ -294,12 +294,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PostIncDecExpression.
-	visitPostIncDecExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#LiteralExpression.
 	visitLiteralExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -354,6 +348,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
+	// Visit a parse tree produced by GameMakerLanguageParser#IncDecExpression.
+	visitIncDecExpression(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by GameMakerLanguageParser#EqualityExpression.
 	visitEqualityExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -384,12 +384,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PreIncDecExpression.
-	visitPreIncDecExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#BitShiftExpression.
 	visitBitShiftExpression(ctx) {
 	  return this.visitChildren(ctx);
@@ -408,26 +402,14 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PostIncrementStatement.
-	visitPostIncrementStatement(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#PreIncDecExpression.
+	visitPreIncDecExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#PostDecreaseStatement.
-	visitPostDecreaseStatement(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#PreIncrementStatement.
-	visitPreIncrementStatement(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#PreDecreaseStatement.
-	visitPreDecreaseStatement(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#PostIncDecExpression.
+	visitPostIncDecExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

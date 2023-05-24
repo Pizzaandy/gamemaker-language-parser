@@ -48,6 +48,8 @@ export default class GMLParser {
             return null;
         }
 
+        return {};
+
         if (this.options.getComments) {
             lexer.reset();
             this.getHiddenNodes(lexer);

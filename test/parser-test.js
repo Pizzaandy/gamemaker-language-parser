@@ -2,16 +2,10 @@ import GMLParser from '../src/parser/gml-parser.js';
 import fs from 'fs';
 import clipboardy from 'clipboardy';
 
-const fp = 'test/input/loungeware.gml';
+const fp = 'test/large-files/__scribble_gen_6_build_lines.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
-input = `switch foo {
-    case bar:
-    case baz:
-        break
-    case foobar:
-        break
-}`;
+//input = `b = (foo).bar[0]()`;
 
 console.time("cold");
 GMLParser.parse(input, {getLocations: true});

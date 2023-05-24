@@ -171,8 +171,7 @@ expressionSequence
     ;
 
 expression
-    : ('++' | '--') lValueExpression # PreIncDecExpression
-    | lValueExpression ('++' | '--') # PostIncDecExpression
+    : incDecStatement # IncDecExpression
     | lValueExpression # VariableExpression
     | callStatement # CallExpression
     | functionDeclaration # FunctionExpression
@@ -198,7 +197,7 @@ expression
     | literal # LiteralExpression
     | '(' expression ')' # ParenthesizedExpression
     ;
-    
+
 callStatement
     : callableExpression arguments
     | callStatement arguments
@@ -206,15 +205,12 @@ callStatement
 
 callableExpression
     : lValueExpression
-    | '(' functionDeclaration ')'
-    | '(' callableExpression ')'
+    | '(' (functionDeclaration | callableExpression) ')'
     ;
 
 incDecStatement
-    : lValueExpression '++' # PostIncrementStatement
-    | lValueExpression '--' # PostDecreaseStatement
-    | '++' lValueExpression  # PreIncrementStatement
-    | '--' lValueExpression  # PreDecreaseStatement
+    : ('++' | '--') lValueExpression # PreIncDecExpression
+    | lValueExpression ('++' | '--') # PostIncDecExpression
     ;
     
 accessor
@@ -286,7 +282,7 @@ structLiteral
     ;
 
 functionDeclaration
-    : Function_ identifier? parameterList ((':' identifier parameterList)? Constructor)? statement
+    : Function_ identifier? parameterList (':' identifier parameterList)? Constructor? statement
     ;
     
 parameterList

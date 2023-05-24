@@ -438,7 +438,6 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
         let finalOp = this.visit(ctx.lValueFinalOperator());
         finalOp.object = object;
-
         return finalOp;
     }
 
@@ -682,6 +681,10 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
         });
     }
 
+    visitIncDecExpression(ctx) {
+        return this.visit(ctx.incDecStatement());
+    }
+
     // Visit a parse tree produced by GameMakerLanguageParser#PostIncrementExpression.
     visitPostIncDecExpression(ctx) {
         let operator = null;
@@ -817,46 +820,6 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
             type: "CallExpression",
             object: object,
             arguments: this.visit(ctx.arguments()),
-        });
-    }
-
-    // Visit a parse tree produced by GameMakerLanguageParser#PostIncrementStatement.
-    visitPostIncrementStatement(ctx) {
-        return this.astNode(ctx, {
-            type: "IncDecStatement",
-            operator: "++",
-            prefix: false,
-            argument: this.visit(ctx.lValueExpression()),
-        });
-    }
-
-    // Visit a parse tree produced by GameMakerLanguageParser#PostDecreaseStatement.
-    visitPostDecreaseStatement(ctx) {
-        return this.astNode(ctx, {
-            type: "IncDecStatement",
-            operator: "--",
-            prefix: false,
-            argument: this.visit(ctx.lValueExpression()),
-        });
-    }
-
-    // Visit a parse tree produced by GameMakerLanguageParser#PreIncrementStatement.
-    visitPreIncrementStatement(ctx) {
-        return this.astNode(ctx, {
-            type: "IncDecStatement",
-            operator: "++",
-            prefix: true,
-            argument: this.visit(ctx.lValueExpression()),
-        });
-    }
-
-    // Visit a parse tree produced by GameMakerLanguageParser#PreDecreaseStatement.
-    visitPreDecreaseStatement(ctx) {
-        return this.astNode(ctx, {
-            type: "IncDecStatement",
-            operator: "--",
-            prefix: true,
-            argument: this.visit(ctx.lValueExpression()),
         });
     }
 
