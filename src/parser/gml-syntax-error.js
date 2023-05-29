@@ -67,7 +67,7 @@ export default class GameMakerParseErrorListener extends ErrorListener {
         throw (
             `Syntax Error (line ${line}, column ${column}): ` +
             `unexpected ${wrongSymbol}`
-            + ` while matching ${currentRuleFormatted}`
+            + ` while matching rule ${currentRuleFormatted}`
         );
     }
 }

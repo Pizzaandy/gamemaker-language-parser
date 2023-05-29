@@ -210,14 +210,8 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#CompoundLValue.
-	visitCompoundLValue(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#SimpleLValue.
-	visitSimpleLValue(ctx) {
+	// Visit a parse tree produced by GameMakerLanguageParser#lValueExpression.
+	visitLValueExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -254,6 +248,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#expressionSequence.
 	visitExpressionSequence(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#expressionOrFunction.
+	visitExpressionOrFunction(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -314,12 +314,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#NotExpression.
 	visitNotExpression(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by GameMakerLanguageParser#FunctionExpression.
-	visitFunctionExpression(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -426,12 +420,6 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 	}
 
 
-	// Visit a parse tree produced by GameMakerLanguageParser#argument.
-	visitArgument(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by GameMakerLanguageParser#assignmentOperator.
 	visitAssignmentOperator(ctx) {
 	  return this.visitChildren(ctx);
@@ -476,6 +464,12 @@ export default class GameMakerLanguageParserVisitor extends antlr4.tree.ParseTre
 
 	// Visit a parse tree produced by GameMakerLanguageParser#functionDeclaration.
 	visitFunctionDeclaration(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by GameMakerLanguageParser#constructorClause.
+	visitConstructorClause(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
