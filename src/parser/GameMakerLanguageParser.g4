@@ -9,7 +9,7 @@ program
 statementList
     : statement+
     ;
-    
+
 statement
     : (block
     | emptyStatement
@@ -39,30 +39,30 @@ statement
 block
     : openBlock statementList? closeBlock
     ;
-    
+
 ifStatement
     : If expression Then? statement (Else statement)?
     ;
-    
+
 iterationStatement
     : Do statement Until expression # DoStatement
     | While expression statement # WhileStatement
     | For '('
-        (variableDeclarationList | assignmentExpression)? ';' 
-        expression? ';' 
-        statement? 
+        (variableDeclarationList | assignmentExpression)? ';'
+        expression? ';'
+        statement?
     ')' statement # ForStatement
     | Repeat expression statement # RepeatStatement
     ;
-    
+
 withStatement
     : With expression statement
     ;
-    
+
 switchStatement
     : Switch expression caseBlock
     ;
-    
+
 continueStatement
     : Continue
     ;
@@ -70,15 +70,15 @@ continueStatement
 breakStatement
     : Break
     ;
-    
+
 exitStatement
     : Exit
     ;
-    
+
 emptyStatement
     : SemiColon
     ;
-    
+
 caseBlock
     : openBlock caseClauses? (defaultClause caseClauses?)? closeBlock
     ;
@@ -86,11 +86,11 @@ caseBlock
 caseClauses
     : caseClause+
     ;
-    
+
 caseClause
     : Case expression ':' statementList?
     ;
-    
+
 defaultClause
     : Default ':' statementList?
     ;
@@ -110,7 +110,7 @@ catchProduction
 finallyProduction
     : Finally statement
     ;
-    
+
 returnStatement
     : Return expression?
     ;
@@ -120,18 +120,18 @@ deleteStatement
     ;
 
 assignmentExpression
-    : lValueExpression assignmentOperator expression
+    : lValueExpression assignmentOperator expressionOrFunction
     ;
 
 variableDeclarationList
     : varModifier variableDeclaration (',' variableDeclaration)*
     ;
-    
+
 varModifier
     : Var+
     | Static
     ;
-    
+
 variableDeclaration
     : identifier (Assign expression)?
     ;
@@ -151,8 +151,7 @@ lValueStartExpression
     ;
 
 lValueExpression
-    : lValueStartExpression lValueChainOperator* lValueFinalOperator # CompoundLValue
-    | lValueStartExpression # SimpleLValue
+    : lValueStartExpression (lValueChainOperator* lValueFinalOperator)?
     ;
 
 lValueChainOperator
@@ -170,16 +169,20 @@ expressionSequence
     : expression (',' expression)*
     ;
 
+expressionOrFunction
+    : (expression | functionDeclaration)
+    | '(' expressionOrFunction ')'
+    ;
+
 expression
     : incDecStatement # IncDecExpression
     | lValueExpression # VariableExpression
     | callStatement # CallExpression
-    | functionDeclaration # FunctionExpression
 
     | '-' expression # UnaryMinusExpression
     | '~' expression # BitNotExpression
     | Not expression # NotExpression
-    
+
     | expression ('*' | '/' | Modulo | IntegerDivide) expression # MultiplicativeExpression
     | expression ('+' | '-') expression # AdditiveExpression
     | expression '??' expression # CoalesceExpression
@@ -212,7 +215,7 @@ incDecStatement
     : ('++' | '--') lValueExpression # PreIncDecExpression
     | lValueExpression ('++' | '--') # PostIncDecExpression
     ;
-    
+
 accessor
     : OpenBracket
     | ListAccessor
@@ -221,15 +224,11 @@ accessor
     | ArrayAccessor
     | StructAccessor
     ;
-    
+
 arguments
-    : '(' ( argument (',' argument)* ','? )? ')'
+    : '(' ( expressionOrFunction (',' expressionOrFunction)* ','? )? ')'
     ;
-    
-argument
-    : expression
-    ;
-    
+
 assignmentOperator
     : '*='
     | '/='
@@ -244,7 +243,7 @@ assignmentOperator
     | '??='
     | Assign
     ;
-    
+
 literal
     : UndefinedLiteral
     | NoOneLiteral
@@ -276,51 +275,55 @@ arrayLiteral
 elementList
     : ','* expression? (','+ expression)* ','? // Yes, everything is optional
     ;
-    
+
 structLiteral
     : openBlock (propertyAssignment (',' propertyAssignment)* ','?)? closeBlock
     ;
 
 functionDeclaration
-    : Function_ identifier? parameterList (':' identifier parameterList)? Constructor? statement
+    : Function_ Identifier? parameterList constructorClause? statement
     ;
-    
+
+constructorClause
+    : (':' Identifier parameterList)? Constructor
+    ;
+
 parameterList
     : '(' (parameterArgument (',' parameterArgument)* ','?)? ')'
     ;
-    
+
 parameterArgument
-    : identifier (Assign expression)?
+    : identifier (Assign expressionOrFunction)?
     ;
-    
+
 propertyAssignment
-    : propertyIdentifier ':' expression
+    : propertyIdentifier ':' expressionOrFunction
     ;
 
 propertyIdentifier
     : Identifier | softKeyword | propertySoftKeyword
     ;
-    
+
 identifier
     : Identifier | softKeyword
     ;
-    
+
 enumeratorDeclaration
-    : Enum identifier openBlock enumeratorList? ','? closeBlock
+    : Enum identifier openBlock (enumeratorList)? closeBlock
     ;
-    
+
 enumeratorList
-    : enumerator (',' enumerator)*
+    : enumerator (',' enumerator)* ','?
     ;
 
 enumerator
-    : identifier (Assign IntegerLiteral)?
+    : identifier (Assign (IntegerLiteral | HexIntegerLiteral | BinaryLiteral))?
     ;
 
 macroStatement
     : Macro identifier macroToken+ (LineTerminator | EOF)
     ;
-    
+
 defineStatement
     : Define RegionCharacters (RegionEOL | EOF)
     ;
@@ -333,7 +336,7 @@ regionStatement
 identifierStatement
     : identifier
     ;
-    
+
 softKeyword
     : Constructor
     ;
@@ -353,26 +356,26 @@ closeBlock
 eos
     : SemiColon
     ;
-    
+
 // every token except:
 // WhiteSpaces, LineTerminator, Define, Macro, Region, EndRegion, UnexpectedCharacter
 // includes EscapedNewLine
 macroToken
-    : EscapedNewLine | OpenBracket | CloseBracket | OpenParen | CloseParen 
-    | OpenBrace | CloseBrace | Begin | End | SemiColon | Comma | Assign | Colon 
-    | Dot | PlusPlus | MinusMinus | Plus | Minus | BitNot | Not | Multiply | Divide 
-    | IntegerDivide | Modulo | Power | QuestionMark | NullCoalesce 
-    | NullCoalescingAssign | RightShiftArithmetic | LeftShiftArithmetic 
-    | LessThan | MoreThan | LessThanEquals | GreaterThanEquals | Equals_ | NotEquals 
-    | BitAnd | BitXOr | BitOr | And | Or | Xor | MultiplyAssign | DivideAssign | PlusAssign 
-    | MinusAssign | ModulusAssign | LeftShiftArithmeticAssign | RightShiftArithmeticAssign 
-    | BitAndAssign | BitXorAssign | BitOrAssign | NumberSign | DollarSign | AtSign 
-    | UndefinedLiteral | NoOneLiteral | BooleanLiteral | IntegerLiteral | DecimalLiteral 
-    | BinaryLiteral | HexIntegerLiteral | Break | Exit | Do | Case | Else | New 
-    | Var | GlobalVar | Catch | Finally | Return | Continue | For | Switch | While 
-    | Until | Repeat | Function_ | With | Default | If | Then | Throw | Delete 
+    : EscapedNewLine | OpenBracket | CloseBracket | OpenParen | CloseParen
+    | OpenBrace | CloseBrace | Begin | End | SemiColon | Comma | Assign | Colon
+    | Dot | PlusPlus | MinusMinus | Plus | Minus | BitNot | Not | Multiply | Divide
+    | IntegerDivide | Modulo | Power | QuestionMark | NullCoalesce
+    | NullCoalescingAssign | RightShiftArithmetic | LeftShiftArithmetic
+    | LessThan | MoreThan | LessThanEquals | GreaterThanEquals | Equals_ | NotEquals
+    | BitAnd | BitXOr | BitOr | And | Or | Xor | MultiplyAssign | DivideAssign | PlusAssign
+    | MinusAssign | ModulusAssign | LeftShiftArithmeticAssign | RightShiftArithmeticAssign
+    | BitAndAssign | BitXorAssign | BitOrAssign | NumberSign | DollarSign | AtSign
+    | UndefinedLiteral | NoOneLiteral | BooleanLiteral | IntegerLiteral | DecimalLiteral
+    | BinaryLiteral | HexIntegerLiteral | Break | Exit | Do | Case | Else | New
+    | Var | GlobalVar | Catch | Finally | Return | Continue | For | Switch | While
+    | Until | Repeat | Function_ | With | Default | If | Then | Throw | Delete
     | Try | Enum | Constructor | Static | Identifier | StringLiteral | VerbatimStringLiteral
     | TemplateStringStart | TemplateStringEnd | TemplateStringText | TemplateStringStartExpression
-    | TemplateStringEndExpression | OpenBracket | ListAccessor | MapAccessor | GridAccessor | ArrayAccessor 
+    | TemplateStringEndExpression | OpenBracket | ListAccessor | MapAccessor | GridAccessor | ArrayAccessor
     | StructAccessor
     ;
