@@ -45,10 +45,10 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 44,1,44,1,45,5,45,536,8,45,10,45,12,45,539,9,45,1,45,3,45,542,8,45,1,45,
 4,45,545,8,45,11,45,12,45,546,1,45,5,45,550,8,45,10,45,12,45,553,9,45,1,
 45,3,45,556,8,45,1,46,1,46,1,46,1,46,5,46,562,8,46,10,46,12,46,565,9,46,
-1,46,3,46,568,8,46,3,46,570,8,46,1,46,1,46,1,47,1,47,3,47,576,8,47,1,47,
-1,47,3,47,580,8,47,1,47,1,47,1,48,1,48,1,48,3,48,587,8,48,1,48,1,48,1,49,
-1,49,1,49,1,49,5,49,595,8,49,10,49,12,49,598,9,49,1,49,3,49,601,8,49,3,49,
-603,8,49,1,49,1,49,1,50,1,50,1,50,3,50,610,8,50,1,51,1,51,1,51,1,51,1,52,
+1,46,3,46,568,8,46,3,46,570,8,46,1,46,1,46,1,47,1,47,1,47,1,47,1,48,1,48,
+1,48,3,48,581,8,48,1,49,1,49,3,49,585,8,49,1,49,1,49,3,49,589,8,49,1,49,
+1,49,1,50,1,50,1,50,3,50,596,8,50,1,50,1,50,1,51,1,51,1,51,1,51,5,51,604,
+8,51,10,51,12,51,607,9,51,1,51,3,51,610,8,51,3,51,612,8,51,1,51,1,51,1,52,
 1,52,1,52,3,52,619,8,52,1,53,1,53,3,53,623,8,53,1,54,1,54,1,54,1,54,3,54,
 629,8,54,1,54,1,54,1,55,1,55,1,55,5,55,636,8,55,10,55,12,55,639,9,55,1,55,
 3,55,642,8,55,1,56,1,56,1,56,3,56,647,8,56,1,57,1,57,1,57,4,57,652,8,57,
@@ -69,8 +69,8 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 1,0,0,0,58,343,1,0,0,0,60,360,1,0,0,0,62,368,1,0,0,0,64,370,1,0,0,0,66,386,
 1,0,0,0,68,403,1,0,0,0,70,452,1,0,0,0,72,471,1,0,0,0,74,478,1,0,0,0,76,480,
 1,0,0,0,78,482,1,0,0,0,80,498,1,0,0,0,82,512,1,0,0,0,84,514,1,0,0,0,86,528,
-1,0,0,0,88,530,1,0,0,0,90,537,1,0,0,0,92,557,1,0,0,0,94,573,1,0,0,0,96,586,
-1,0,0,0,98,590,1,0,0,0,100,606,1,0,0,0,102,611,1,0,0,0,104,618,1,0,0,0,106,
+1,0,0,0,88,530,1,0,0,0,90,537,1,0,0,0,92,557,1,0,0,0,94,573,1,0,0,0,96,580,
+1,0,0,0,98,582,1,0,0,0,100,595,1,0,0,0,102,599,1,0,0,0,104,615,1,0,0,0,106,
 622,1,0,0,0,108,624,1,0,0,0,110,632,1,0,0,0,112,643,1,0,0,0,114,648,1,0,
 0,0,116,657,1,0,0,0,118,661,1,0,0,0,120,667,1,0,0,0,122,669,1,0,0,0,124,
 671,1,0,0,0,126,673,1,0,0,0,128,675,1,0,0,0,130,677,1,0,0,0,132,679,1,0,
@@ -81,7 +81,7 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 8,0,150,167,3,18,9,0,151,167,3,40,20,0,152,167,3,12,6,0,153,167,3,14,7,0,
 154,167,3,34,17,0,155,167,3,32,16,0,156,167,3,20,10,0,157,167,3,114,57,0,
 158,167,3,116,58,0,159,167,3,118,59,0,160,167,3,108,54,0,161,167,3,52,26,
-0,162,167,3,44,22,0,163,167,3,74,37,0,164,167,3,70,35,0,165,167,3,94,47,
+0,162,167,3,44,22,0,163,167,3,74,37,0,164,167,3,70,35,0,165,167,3,98,49,
 0,166,144,1,0,0,0,166,145,1,0,0,0,166,146,1,0,0,0,166,147,1,0,0,0,166,148,
 1,0,0,0,166,149,1,0,0,0,166,150,1,0,0,0,166,151,1,0,0,0,166,152,1,0,0,0,
 166,153,1,0,0,0,166,154,1,0,0,0,166,155,1,0,0,0,166,156,1,0,0,0,166,157,
@@ -126,7 +126,7 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 1,0,0,0,305,47,1,0,0,0,306,304,1,0,0,0,307,309,5,76,0,0,308,307,1,0,0,0,
 309,310,1,0,0,0,310,308,1,0,0,0,310,311,1,0,0,0,311,314,1,0,0,0,312,314,
 5,97,0,0,313,308,1,0,0,0,313,312,1,0,0,0,314,49,1,0,0,0,315,318,3,106,53,
-0,316,317,5,19,0,0,317,319,3,68,34,0,318,316,1,0,0,0,318,319,1,0,0,0,319,
+0,316,317,5,19,0,0,317,319,3,66,33,0,318,316,1,0,0,0,318,319,1,0,0,0,319,
 51,1,0,0,0,320,321,5,77,0,0,321,326,3,106,53,0,322,323,5,18,0,0,323,325,
 3,106,53,0,324,322,1,0,0,0,325,328,1,0,0,0,326,324,1,0,0,0,326,327,1,0,0,
 0,327,329,1,0,0,0,328,326,1,0,0,0,329,330,5,17,0,0,330,53,1,0,0,0,331,332,
@@ -142,7 +142,7 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 9,0,0,365,369,1,0,0,0,366,367,5,21,0,0,367,369,3,106,53,0,368,362,1,0,0,
 0,368,366,1,0,0,0,369,63,1,0,0,0,370,375,3,68,34,0,371,372,5,18,0,0,372,
 374,3,68,34,0,373,371,1,0,0,0,374,377,1,0,0,0,375,373,1,0,0,0,375,376,1,
-0,0,0,376,65,1,0,0,0,377,375,1,0,0,0,378,381,3,68,34,0,379,381,3,94,47,0,
+0,0,0,376,65,1,0,0,0,377,375,1,0,0,0,378,381,3,68,34,0,379,381,3,98,49,0,
 380,378,1,0,0,0,380,379,1,0,0,0,381,387,1,0,0,0,382,383,5,10,0,0,383,384,
 3,66,33,0,384,385,5,11,0,0,385,387,1,0,0,0,386,380,1,0,0,0,386,382,1,0,0,
 0,387,67,1,0,0,0,388,389,6,34,-1,0,389,404,3,74,37,0,390,404,3,58,29,0,391,
@@ -168,7 +168,7 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 -1,0,453,454,3,72,36,0,454,455,3,78,39,0,455,460,1,0,0,0,456,457,10,1,0,
 0,457,459,3,78,39,0,458,456,1,0,0,0,459,462,1,0,0,0,460,458,1,0,0,0,460,
 461,1,0,0,0,461,71,1,0,0,0,462,460,1,0,0,0,463,472,3,58,29,0,464,467,5,10,
-0,0,465,468,3,94,47,0,466,468,3,72,36,0,467,465,1,0,0,0,467,466,1,0,0,0,
+0,0,465,468,3,98,49,0,466,468,3,72,36,0,467,465,1,0,0,0,467,466,1,0,0,0,
 468,469,1,0,0,0,469,470,5,11,0,0,470,472,1,0,0,0,471,463,1,0,0,0,471,464,
 1,0,0,0,472,73,1,0,0,0,473,474,7,5,0,0,474,479,3,58,29,0,475,476,3,58,29,
 0,476,477,7,5,0,0,477,479,1,0,0,0,478,473,1,0,0,0,478,475,1,0,0,0,479,75,
@@ -189,28 +189,28 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 5,13,0,0,527,529,1,0,0,0,528,523,1,0,0,0,528,524,1,0,0,0,529,87,1,0,0,0,
 530,531,5,3,0,0,531,532,3,90,45,0,532,533,5,9,0,0,533,89,1,0,0,0,534,536,
 5,18,0,0,535,534,1,0,0,0,536,539,1,0,0,0,537,535,1,0,0,0,537,538,1,0,0,0,
-538,541,1,0,0,0,539,537,1,0,0,0,540,542,3,68,34,0,541,540,1,0,0,0,541,542,
+538,541,1,0,0,0,539,537,1,0,0,0,540,542,3,66,33,0,541,540,1,0,0,0,541,542,
 1,0,0,0,542,551,1,0,0,0,543,545,5,18,0,0,544,543,1,0,0,0,545,546,1,0,0,0,
-546,544,1,0,0,0,546,547,1,0,0,0,547,548,1,0,0,0,548,550,3,68,34,0,549,544,
+546,544,1,0,0,0,546,547,1,0,0,0,547,548,1,0,0,0,548,550,3,66,33,0,549,544,
 1,0,0,0,550,553,1,0,0,0,551,549,1,0,0,0,551,552,1,0,0,0,552,555,1,0,0,0,
 553,551,1,0,0,0,554,556,5,18,0,0,555,554,1,0,0,0,555,556,1,0,0,0,556,91,
-1,0,0,0,557,569,3,126,63,0,558,563,3,102,51,0,559,560,5,18,0,0,560,562,3,
-102,51,0,561,559,1,0,0,0,562,565,1,0,0,0,563,561,1,0,0,0,563,564,1,0,0,0,
+1,0,0,0,557,569,3,126,63,0,558,563,3,94,47,0,559,560,5,18,0,0,560,562,3,
+94,47,0,561,559,1,0,0,0,562,565,1,0,0,0,563,561,1,0,0,0,563,564,1,0,0,0,
 564,567,1,0,0,0,565,563,1,0,0,0,566,568,5,18,0,0,567,566,1,0,0,0,567,568,
 1,0,0,0,568,570,1,0,0,0,569,558,1,0,0,0,569,570,1,0,0,0,570,571,1,0,0,0,
-571,572,3,128,64,0,572,93,1,0,0,0,573,575,5,87,0,0,574,576,5,103,0,0,575,
-574,1,0,0,0,575,576,1,0,0,0,576,577,1,0,0,0,577,579,3,98,49,0,578,580,3,
-96,48,0,579,578,1,0,0,0,579,580,1,0,0,0,580,581,1,0,0,0,581,582,3,4,2,0,
-582,95,1,0,0,0,583,584,5,20,0,0,584,585,5,103,0,0,585,587,3,98,49,0,586,
-583,1,0,0,0,586,587,1,0,0,0,587,588,1,0,0,0,588,589,5,96,0,0,589,97,1,0,
-0,0,590,602,5,10,0,0,591,596,3,100,50,0,592,593,5,18,0,0,593,595,3,100,50,
-0,594,592,1,0,0,0,595,598,1,0,0,0,596,594,1,0,0,0,596,597,1,0,0,0,597,600,
-1,0,0,0,598,596,1,0,0,0,599,601,5,18,0,0,600,599,1,0,0,0,600,601,1,0,0,0,
-601,603,1,0,0,0,602,591,1,0,0,0,602,603,1,0,0,0,603,604,1,0,0,0,604,605,
-5,11,0,0,605,99,1,0,0,0,606,609,3,106,53,0,607,608,5,19,0,0,608,610,3,66,
-33,0,609,607,1,0,0,0,609,610,1,0,0,0,610,101,1,0,0,0,611,612,3,104,52,0,
-612,613,5,20,0,0,613,614,3,66,33,0,614,103,1,0,0,0,615,619,5,103,0,0,616,
-619,3,122,61,0,617,619,3,124,62,0,618,615,1,0,0,0,618,616,1,0,0,0,618,617,
+571,572,3,128,64,0,572,93,1,0,0,0,573,574,3,96,48,0,574,575,5,20,0,0,575,
+576,3,66,33,0,576,95,1,0,0,0,577,581,5,103,0,0,578,581,3,122,61,0,579,581,
+3,124,62,0,580,577,1,0,0,0,580,578,1,0,0,0,580,579,1,0,0,0,581,97,1,0,0,
+0,582,584,5,87,0,0,583,585,5,103,0,0,584,583,1,0,0,0,584,585,1,0,0,0,585,
+586,1,0,0,0,586,588,3,102,51,0,587,589,3,100,50,0,588,587,1,0,0,0,588,589,
+1,0,0,0,589,590,1,0,0,0,590,591,3,6,3,0,591,99,1,0,0,0,592,593,5,20,0,0,
+593,594,5,103,0,0,594,596,3,102,51,0,595,592,1,0,0,0,595,596,1,0,0,0,596,
+597,1,0,0,0,597,598,5,96,0,0,598,101,1,0,0,0,599,611,5,10,0,0,600,605,3,
+104,52,0,601,602,5,18,0,0,602,604,3,104,52,0,603,601,1,0,0,0,604,607,1,0,
+0,0,605,603,1,0,0,0,605,606,1,0,0,0,606,609,1,0,0,0,607,605,1,0,0,0,608,
+610,5,18,0,0,609,608,1,0,0,0,609,610,1,0,0,0,610,612,1,0,0,0,611,600,1,0,
+0,0,611,612,1,0,0,0,612,613,1,0,0,0,613,614,5,11,0,0,614,103,1,0,0,0,615,
+618,3,106,53,0,616,617,5,19,0,0,617,619,3,66,33,0,618,616,1,0,0,0,618,619,
 1,0,0,0,619,105,1,0,0,0,620,623,5,103,0,0,621,623,3,122,61,0,622,620,1,0,
 0,0,622,621,1,0,0,0,623,107,1,0,0,0,624,625,5,95,0,0,625,626,3,106,53,0,
 626,628,3,126,63,0,627,629,3,110,55,0,628,627,1,0,0,0,628,629,1,0,0,0,629,
@@ -230,7 +230,7 @@ const serializedATN = [4,1,114,682,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,
 71,135,142,166,169,173,180,185,200,204,208,216,236,240,242,249,255,260,269,
 272,277,280,289,304,310,313,318,326,341,347,351,360,368,375,380,386,403,
 447,449,460,467,471,478,488,492,494,512,518,528,537,541,546,551,555,563,
-567,569,575,579,586,596,600,602,609,618,622,628,637,641,646,653,663];
+567,569,580,584,588,595,605,609,611,618,622,628,637,641,646,653,663];
 
 
 const atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
@@ -308,8 +308,8 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
                          "accessor", "arguments", "assignmentOperator", 
                          "literal", "templateStringLiteral", "templateStringAtom", 
                          "arrayLiteral", "elementList", "structLiteral", 
-                         "functionDeclaration", "constructorClause", "parameterList", 
-                         "parameterArgument", "propertyAssignment", "propertyIdentifier", 
+                         "propertyAssignment", "propertyIdentifier", "functionDeclaration", 
+                         "constructorClause", "parameterList", "parameterArgument", 
                          "identifier", "enumeratorDeclaration", "enumeratorList", 
                          "enumerator", "macroStatement", "defineStatement", 
                          "regionStatement", "identifierStatement", "softKeyword", 
@@ -1304,6 +1304,7 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	variableDeclarationList() {
 	    let localctx = new VariableDeclarationListContext(this, this._ctx, this.state);
 	    this.enterRule(localctx, 46, GameMakerLanguageParser.RULE_variableDeclarationList);
+	    var _la = 0;
 	    try {
 	        this.enterOuterAlt(localctx, 1);
 	        this.state = 298;
@@ -1312,19 +1313,16 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	        this.variableDeclaration();
 	        this.state = 304;
 	        this._errHandler.sync(this);
-	        var _alt = this._interp.adaptivePredict(this._input,22,this._ctx)
-	        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-	            if(_alt===1) {
-	                this.state = 300;
-	                this.match(GameMakerLanguageParser.Comma);
-	                this.state = 301;
-	                this.variableDeclaration(); 
-	            }
+	        _la = this._input.LA(1);
+	        while(_la===18) {
+	            this.state = 300;
+	            this.match(GameMakerLanguageParser.Comma);
+	            this.state = 301;
+	            this.variableDeclaration();
 	            this.state = 306;
 	            this._errHandler.sync(this);
-	            _alt = this._interp.adaptivePredict(this._input,22,this._ctx);
+	            _la = this._input.LA(1);
 	        }
-
 	    } catch (re) {
 	    	if(re instanceof antlr4.error.RecognitionException) {
 		        localctx.exception = re;
@@ -1401,7 +1399,7 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	            this.state = 316;
 	            this.match(GameMakerLanguageParser.Assign);
 	            this.state = 317;
-	            this.expression(0);
+	            this.expressionOrFunction();
 	        }
 
 	    } catch (re) {
@@ -2634,9 +2632,9 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	        this.state = 541;
 	        this._errHandler.sync(this);
 	        _la = this._input.LA(1);
-	        if((((_la) & ~0x1f) === 0 && ((1 << _la) & 247501832) !== 0) || ((((_la - 63)) & ~0x1f) === 0 && ((1 << (_la - 63)) & 4223) !== 0) || ((((_la - 96)) & ~0x1f) === 0 && ((1 << (_la - 96)) & 1921) !== 0)) {
+	        if((((_la) & ~0x1f) === 0 && ((1 << _la) & 247501832) !== 0) || ((((_la - 63)) & ~0x1f) === 0 && ((1 << (_la - 63)) & 16781439) !== 0) || ((((_la - 96)) & ~0x1f) === 0 && ((1 << (_la - 96)) & 1921) !== 0)) {
 	            this.state = 540;
-	            this.expression(0);
+	            this.expressionOrFunction();
 	        }
 
 	        this.state = 551;
@@ -2655,7 +2653,7 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 	                    _la = this._input.LA(1);
 	                } while(_la===18);
 	                this.state = 548;
-	                this.expression(0); 
+	                this.expressionOrFunction(); 
 	            }
 	            this.state = 553;
 	            this._errHandler.sync(this);
@@ -2743,187 +2741,16 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 
 
 
-	functionDeclaration() {
-	    let localctx = new FunctionDeclarationContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 94, GameMakerLanguageParser.RULE_functionDeclaration);
-	    var _la = 0;
+	propertyAssignment() {
+	    let localctx = new PropertyAssignmentContext(this, this._ctx, this.state);
+	    this.enterRule(localctx, 94, GameMakerLanguageParser.RULE_propertyAssignment);
 	    try {
 	        this.enterOuterAlt(localctx, 1);
 	        this.state = 573;
-	        this.match(GameMakerLanguageParser.Function_);
-	        this.state = 575;
-	        this._errHandler.sync(this);
-	        _la = this._input.LA(1);
-	        if(_la===103) {
-	            this.state = 574;
-	            this.match(GameMakerLanguageParser.Identifier);
-	        }
-
-	        this.state = 577;
-	        this.parameterList();
-	        this.state = 579;
-	        this._errHandler.sync(this);
-	        var la_ = this._interp.adaptivePredict(this._input,57,this._ctx);
-	        if(la_===1) {
-	            this.state = 578;
-	            this.constructorClause();
-
-	        }
-	        this.state = 581;
-	        this.statement();
-	    } catch (re) {
-	    	if(re instanceof antlr4.error.RecognitionException) {
-		        localctx.exception = re;
-		        this._errHandler.reportError(this, re);
-		        this._errHandler.recover(this, re);
-		    } else {
-		    	throw re;
-		    }
-	    } finally {
-	        this.exitRule();
-	    }
-	    return localctx;
-	}
-
-
-
-	constructorClause() {
-	    let localctx = new ConstructorClauseContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 96, GameMakerLanguageParser.RULE_constructorClause);
-	    var _la = 0;
-	    try {
-	        this.enterOuterAlt(localctx, 1);
-	        this.state = 586;
-	        this._errHandler.sync(this);
-	        _la = this._input.LA(1);
-	        if(_la===20) {
-	            this.state = 583;
-	            this.match(GameMakerLanguageParser.Colon);
-	            this.state = 584;
-	            this.match(GameMakerLanguageParser.Identifier);
-	            this.state = 585;
-	            this.parameterList();
-	        }
-
-	        this.state = 588;
-	        this.match(GameMakerLanguageParser.Constructor);
-	    } catch (re) {
-	    	if(re instanceof antlr4.error.RecognitionException) {
-		        localctx.exception = re;
-		        this._errHandler.reportError(this, re);
-		        this._errHandler.recover(this, re);
-		    } else {
-		    	throw re;
-		    }
-	    } finally {
-	        this.exitRule();
-	    }
-	    return localctx;
-	}
-
-
-
-	parameterList() {
-	    let localctx = new ParameterListContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 98, GameMakerLanguageParser.RULE_parameterList);
-	    var _la = 0;
-	    try {
-	        this.enterOuterAlt(localctx, 1);
-	        this.state = 590;
-	        this.match(GameMakerLanguageParser.OpenParen);
-	        this.state = 602;
-	        this._errHandler.sync(this);
-	        _la = this._input.LA(1);
-	        if(_la===96 || _la===103) {
-	            this.state = 591;
-	            this.parameterArgument();
-	            this.state = 596;
-	            this._errHandler.sync(this);
-	            var _alt = this._interp.adaptivePredict(this._input,59,this._ctx)
-	            while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-	                if(_alt===1) {
-	                    this.state = 592;
-	                    this.match(GameMakerLanguageParser.Comma);
-	                    this.state = 593;
-	                    this.parameterArgument(); 
-	                }
-	                this.state = 598;
-	                this._errHandler.sync(this);
-	                _alt = this._interp.adaptivePredict(this._input,59,this._ctx);
-	            }
-
-	            this.state = 600;
-	            this._errHandler.sync(this);
-	            _la = this._input.LA(1);
-	            if(_la===18) {
-	                this.state = 599;
-	                this.match(GameMakerLanguageParser.Comma);
-	            }
-
-	        }
-
-	        this.state = 604;
-	        this.match(GameMakerLanguageParser.CloseParen);
-	    } catch (re) {
-	    	if(re instanceof antlr4.error.RecognitionException) {
-		        localctx.exception = re;
-		        this._errHandler.reportError(this, re);
-		        this._errHandler.recover(this, re);
-		    } else {
-		    	throw re;
-		    }
-	    } finally {
-	        this.exitRule();
-	    }
-	    return localctx;
-	}
-
-
-
-	parameterArgument() {
-	    let localctx = new ParameterArgumentContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 100, GameMakerLanguageParser.RULE_parameterArgument);
-	    var _la = 0;
-	    try {
-	        this.enterOuterAlt(localctx, 1);
-	        this.state = 606;
-	        this.identifier();
-	        this.state = 609;
-	        this._errHandler.sync(this);
-	        _la = this._input.LA(1);
-	        if(_la===19) {
-	            this.state = 607;
-	            this.match(GameMakerLanguageParser.Assign);
-	            this.state = 608;
-	            this.expressionOrFunction();
-	        }
-
-	    } catch (re) {
-	    	if(re instanceof antlr4.error.RecognitionException) {
-		        localctx.exception = re;
-		        this._errHandler.reportError(this, re);
-		        this._errHandler.recover(this, re);
-		    } else {
-		    	throw re;
-		    }
-	    } finally {
-	        this.exitRule();
-	    }
-	    return localctx;
-	}
-
-
-
-	propertyAssignment() {
-	    let localctx = new PropertyAssignmentContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 102, GameMakerLanguageParser.RULE_propertyAssignment);
-	    try {
-	        this.enterOuterAlt(localctx, 1);
-	        this.state = 611;
 	        this.propertyIdentifier();
-	        this.state = 612;
+	        this.state = 574;
 	        this.match(GameMakerLanguageParser.Colon);
-	        this.state = 613;
+	        this.state = 575;
 	        this.expressionOrFunction();
 	    } catch (re) {
 	    	if(re instanceof antlr4.error.RecognitionException) {
@@ -2943,29 +2770,200 @@ export default class GameMakerLanguageParser extends antlr4.Parser {
 
 	propertyIdentifier() {
 	    let localctx = new PropertyIdentifierContext(this, this._ctx, this.state);
-	    this.enterRule(localctx, 104, GameMakerLanguageParser.RULE_propertyIdentifier);
+	    this.enterRule(localctx, 96, GameMakerLanguageParser.RULE_propertyIdentifier);
 	    try {
-	        this.state = 618;
+	        this.state = 580;
 	        this._errHandler.sync(this);
 	        switch(this._input.LA(1)) {
 	        case 103:
 	            this.enterOuterAlt(localctx, 1);
-	            this.state = 615;
+	            this.state = 577;
 	            this.match(GameMakerLanguageParser.Identifier);
 	            break;
 	        case 96:
 	            this.enterOuterAlt(localctx, 2);
-	            this.state = 616;
+	            this.state = 578;
 	            this.softKeyword();
 	            break;
 	        case 64:
 	            this.enterOuterAlt(localctx, 3);
-	            this.state = 617;
+	            this.state = 579;
 	            this.propertySoftKeyword();
 	            break;
 	        default:
 	            throw new antlr4.error.NoViableAltException(this);
 	        }
+	    } catch (re) {
+	    	if(re instanceof antlr4.error.RecognitionException) {
+		        localctx.exception = re;
+		        this._errHandler.reportError(this, re);
+		        this._errHandler.recover(this, re);
+		    } else {
+		    	throw re;
+		    }
+	    } finally {
+	        this.exitRule();
+	    }
+	    return localctx;
+	}
+
+
+
+	functionDeclaration() {
+	    let localctx = new FunctionDeclarationContext(this, this._ctx, this.state);
+	    this.enterRule(localctx, 98, GameMakerLanguageParser.RULE_functionDeclaration);
+	    var _la = 0;
+	    try {
+	        this.enterOuterAlt(localctx, 1);
+	        this.state = 582;
+	        this.match(GameMakerLanguageParser.Function_);
+	        this.state = 584;
+	        this._errHandler.sync(this);
+	        _la = this._input.LA(1);
+	        if(_la===103) {
+	            this.state = 583;
+	            this.match(GameMakerLanguageParser.Identifier);
+	        }
+
+	        this.state = 586;
+	        this.parameterList();
+	        this.state = 588;
+	        this._errHandler.sync(this);
+	        _la = this._input.LA(1);
+	        if(_la===20 || _la===96) {
+	            this.state = 587;
+	            this.constructorClause();
+	        }
+
+	        this.state = 590;
+	        this.block();
+	    } catch (re) {
+	    	if(re instanceof antlr4.error.RecognitionException) {
+		        localctx.exception = re;
+		        this._errHandler.reportError(this, re);
+		        this._errHandler.recover(this, re);
+		    } else {
+		    	throw re;
+		    }
+	    } finally {
+	        this.exitRule();
+	    }
+	    return localctx;
+	}
+
+
+
+	constructorClause() {
+	    let localctx = new ConstructorClauseContext(this, this._ctx, this.state);
+	    this.enterRule(localctx, 100, GameMakerLanguageParser.RULE_constructorClause);
+	    var _la = 0;
+	    try {
+	        this.enterOuterAlt(localctx, 1);
+	        this.state = 595;
+	        this._errHandler.sync(this);
+	        _la = this._input.LA(1);
+	        if(_la===20) {
+	            this.state = 592;
+	            this.match(GameMakerLanguageParser.Colon);
+	            this.state = 593;
+	            this.match(GameMakerLanguageParser.Identifier);
+	            this.state = 594;
+	            this.parameterList();
+	        }
+
+	        this.state = 597;
+	        this.match(GameMakerLanguageParser.Constructor);
+	    } catch (re) {
+	    	if(re instanceof antlr4.error.RecognitionException) {
+		        localctx.exception = re;
+		        this._errHandler.reportError(this, re);
+		        this._errHandler.recover(this, re);
+		    } else {
+		    	throw re;
+		    }
+	    } finally {
+	        this.exitRule();
+	    }
+	    return localctx;
+	}
+
+
+
+	parameterList() {
+	    let localctx = new ParameterListContext(this, this._ctx, this.state);
+	    this.enterRule(localctx, 102, GameMakerLanguageParser.RULE_parameterList);
+	    var _la = 0;
+	    try {
+	        this.enterOuterAlt(localctx, 1);
+	        this.state = 599;
+	        this.match(GameMakerLanguageParser.OpenParen);
+	        this.state = 611;
+	        this._errHandler.sync(this);
+	        _la = this._input.LA(1);
+	        if(_la===96 || _la===103) {
+	            this.state = 600;
+	            this.parameterArgument();
+	            this.state = 605;
+	            this._errHandler.sync(this);
+	            var _alt = this._interp.adaptivePredict(this._input,60,this._ctx)
+	            while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+	                if(_alt===1) {
+	                    this.state = 601;
+	                    this.match(GameMakerLanguageParser.Comma);
+	                    this.state = 602;
+	                    this.parameterArgument(); 
+	                }
+	                this.state = 607;
+	                this._errHandler.sync(this);
+	                _alt = this._interp.adaptivePredict(this._input,60,this._ctx);
+	            }
+
+	            this.state = 609;
+	            this._errHandler.sync(this);
+	            _la = this._input.LA(1);
+	            if(_la===18) {
+	                this.state = 608;
+	                this.match(GameMakerLanguageParser.Comma);
+	            }
+
+	        }
+
+	        this.state = 613;
+	        this.match(GameMakerLanguageParser.CloseParen);
+	    } catch (re) {
+	    	if(re instanceof antlr4.error.RecognitionException) {
+		        localctx.exception = re;
+		        this._errHandler.reportError(this, re);
+		        this._errHandler.recover(this, re);
+		    } else {
+		    	throw re;
+		    }
+	    } finally {
+	        this.exitRule();
+	    }
+	    return localctx;
+	}
+
+
+
+	parameterArgument() {
+	    let localctx = new ParameterArgumentContext(this, this._ctx, this.state);
+	    this.enterRule(localctx, 104, GameMakerLanguageParser.RULE_parameterArgument);
+	    var _la = 0;
+	    try {
+	        this.enterOuterAlt(localctx, 1);
+	        this.state = 615;
+	        this.identifier();
+	        this.state = 618;
+	        this._errHandler.sync(this);
+	        _la = this._input.LA(1);
+	        if(_la===19) {
+	            this.state = 616;
+	            this.match(GameMakerLanguageParser.Assign);
+	            this.state = 617;
+	            this.expressionOrFunction();
+	        }
+
 	    } catch (re) {
 	    	if(re instanceof antlr4.error.RecognitionException) {
 		        localctx.exception = re;
@@ -3621,12 +3619,12 @@ GameMakerLanguageParser.RULE_templateStringAtom = 43;
 GameMakerLanguageParser.RULE_arrayLiteral = 44;
 GameMakerLanguageParser.RULE_elementList = 45;
 GameMakerLanguageParser.RULE_structLiteral = 46;
-GameMakerLanguageParser.RULE_functionDeclaration = 47;
-GameMakerLanguageParser.RULE_constructorClause = 48;
-GameMakerLanguageParser.RULE_parameterList = 49;
-GameMakerLanguageParser.RULE_parameterArgument = 50;
-GameMakerLanguageParser.RULE_propertyAssignment = 51;
-GameMakerLanguageParser.RULE_propertyIdentifier = 52;
+GameMakerLanguageParser.RULE_propertyAssignment = 47;
+GameMakerLanguageParser.RULE_propertyIdentifier = 48;
+GameMakerLanguageParser.RULE_functionDeclaration = 49;
+GameMakerLanguageParser.RULE_constructorClause = 50;
+GameMakerLanguageParser.RULE_parameterList = 51;
+GameMakerLanguageParser.RULE_parameterArgument = 52;
 GameMakerLanguageParser.RULE_identifier = 53;
 GameMakerLanguageParser.RULE_enumeratorDeclaration = 54;
 GameMakerLanguageParser.RULE_enumeratorList = 55;
@@ -4877,8 +4875,8 @@ class VariableDeclarationContext extends antlr4.ParserRuleContext {
 	    return this.getToken(GameMakerLanguageParser.Assign, 0);
 	};
 
-	expression() {
-	    return this.getTypedRuleContext(ExpressionContext,0);
+	expressionOrFunction() {
+	    return this.getTypedRuleContext(ExpressionOrFunctionContext,0);
 	};
 
 	accept(visitor) {
@@ -6747,14 +6745,14 @@ class ElementListContext extends antlr4.ParserRuleContext {
 	};
 
 
-	expression = function(i) {
+	expressionOrFunction = function(i) {
 	    if(i===undefined) {
 	        i = null;
 	    }
 	    if(i===null) {
-	        return this.getTypedRuleContexts(ExpressionContext);
+	        return this.getTypedRuleContexts(ExpressionOrFunctionContext);
 	    } else {
-	        return this.getTypedRuleContext(ExpressionContext,i);
+	        return this.getTypedRuleContext(ExpressionOrFunctionContext,i);
 	    }
 	};
 
@@ -6829,6 +6827,84 @@ class StructLiteralContext extends antlr4.ParserRuleContext {
 
 
 
+class PropertyAssignmentContext extends antlr4.ParserRuleContext {
+
+    constructor(parser, parent, invokingState) {
+        if(parent===undefined) {
+            parent = null;
+        }
+        if(invokingState===undefined || invokingState===null) {
+            invokingState = -1;
+        }
+        super(parent, invokingState);
+        this.parser = parser;
+        this.ruleIndex = GameMakerLanguageParser.RULE_propertyAssignment;
+    }
+
+	propertyIdentifier() {
+	    return this.getTypedRuleContext(PropertyIdentifierContext,0);
+	};
+
+	Colon() {
+	    return this.getToken(GameMakerLanguageParser.Colon, 0);
+	};
+
+	expressionOrFunction() {
+	    return this.getTypedRuleContext(ExpressionOrFunctionContext,0);
+	};
+
+	accept(visitor) {
+	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
+	        return visitor.visitPropertyAssignment(this);
+	    } else {
+	        return visitor.visitChildren(this);
+	    }
+	}
+
+
+}
+
+
+
+class PropertyIdentifierContext extends antlr4.ParserRuleContext {
+
+    constructor(parser, parent, invokingState) {
+        if(parent===undefined) {
+            parent = null;
+        }
+        if(invokingState===undefined || invokingState===null) {
+            invokingState = -1;
+        }
+        super(parent, invokingState);
+        this.parser = parser;
+        this.ruleIndex = GameMakerLanguageParser.RULE_propertyIdentifier;
+    }
+
+	Identifier() {
+	    return this.getToken(GameMakerLanguageParser.Identifier, 0);
+	};
+
+	softKeyword() {
+	    return this.getTypedRuleContext(SoftKeywordContext,0);
+	};
+
+	propertySoftKeyword() {
+	    return this.getTypedRuleContext(PropertySoftKeywordContext,0);
+	};
+
+	accept(visitor) {
+	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
+	        return visitor.visitPropertyIdentifier(this);
+	    } else {
+	        return visitor.visitChildren(this);
+	    }
+	}
+
+
+}
+
+
+
 class FunctionDeclarationContext extends antlr4.ParserRuleContext {
 
     constructor(parser, parent, invokingState) {
@@ -6851,8 +6927,8 @@ class FunctionDeclarationContext extends antlr4.ParserRuleContext {
 	    return this.getTypedRuleContext(ParameterListContext,0);
 	};
 
-	statement() {
-	    return this.getTypedRuleContext(StatementContext,0);
+	block() {
+	    return this.getTypedRuleContext(BlockContext,0);
 	};
 
 	Identifier() {
@@ -7006,84 +7082,6 @@ class ParameterArgumentContext extends antlr4.ParserRuleContext {
 	accept(visitor) {
 	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
 	        return visitor.visitParameterArgument(this);
-	    } else {
-	        return visitor.visitChildren(this);
-	    }
-	}
-
-
-}
-
-
-
-class PropertyAssignmentContext extends antlr4.ParserRuleContext {
-
-    constructor(parser, parent, invokingState) {
-        if(parent===undefined) {
-            parent = null;
-        }
-        if(invokingState===undefined || invokingState===null) {
-            invokingState = -1;
-        }
-        super(parent, invokingState);
-        this.parser = parser;
-        this.ruleIndex = GameMakerLanguageParser.RULE_propertyAssignment;
-    }
-
-	propertyIdentifier() {
-	    return this.getTypedRuleContext(PropertyIdentifierContext,0);
-	};
-
-	Colon() {
-	    return this.getToken(GameMakerLanguageParser.Colon, 0);
-	};
-
-	expressionOrFunction() {
-	    return this.getTypedRuleContext(ExpressionOrFunctionContext,0);
-	};
-
-	accept(visitor) {
-	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
-	        return visitor.visitPropertyAssignment(this);
-	    } else {
-	        return visitor.visitChildren(this);
-	    }
-	}
-
-
-}
-
-
-
-class PropertyIdentifierContext extends antlr4.ParserRuleContext {
-
-    constructor(parser, parent, invokingState) {
-        if(parent===undefined) {
-            parent = null;
-        }
-        if(invokingState===undefined || invokingState===null) {
-            invokingState = -1;
-        }
-        super(parent, invokingState);
-        this.parser = parser;
-        this.ruleIndex = GameMakerLanguageParser.RULE_propertyIdentifier;
-    }
-
-	Identifier() {
-	    return this.getToken(GameMakerLanguageParser.Identifier, 0);
-	};
-
-	softKeyword() {
-	    return this.getTypedRuleContext(SoftKeywordContext,0);
-	};
-
-	propertySoftKeyword() {
-	    return this.getTypedRuleContext(PropertySoftKeywordContext,0);
-	};
-
-	accept(visitor) {
-	    if ( visitor instanceof GameMakerLanguageParserVisitor ) {
-	        return visitor.visitPropertyIdentifier(this);
 	    } else {
 	        return visitor.visitChildren(this);
 	    }
@@ -8098,12 +8096,12 @@ GameMakerLanguageParser.TemplateStringAtomContext = TemplateStringAtomContext;
 GameMakerLanguageParser.ArrayLiteralContext = ArrayLiteralContext; 
 GameMakerLanguageParser.ElementListContext = ElementListContext; 
 GameMakerLanguageParser.StructLiteralContext = StructLiteralContext; 
+GameMakerLanguageParser.PropertyAssignmentContext = PropertyAssignmentContext; 
+GameMakerLanguageParser.PropertyIdentifierContext = PropertyIdentifierContext; 
 GameMakerLanguageParser.FunctionDeclarationContext = FunctionDeclarationContext; 
 GameMakerLanguageParser.ConstructorClauseContext = ConstructorClauseContext; 
 GameMakerLanguageParser.ParameterListContext = ParameterListContext; 
 GameMakerLanguageParser.ParameterArgumentContext = ParameterArgumentContext; 
-GameMakerLanguageParser.PropertyAssignmentContext = PropertyAssignmentContext; 
-GameMakerLanguageParser.PropertyIdentifierContext = PropertyIdentifierContext; 
 GameMakerLanguageParser.IdentifierContext = IdentifierContext; 
 GameMakerLanguageParser.EnumeratorDeclarationContext = EnumeratorDeclarationContext; 
 GameMakerLanguageParser.EnumeratorListContext = EnumeratorListContext; 

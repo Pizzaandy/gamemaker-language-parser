@@ -36,7 +36,6 @@ function nodeTypeNeedsSemicolon(type) {
     return [
         "CallExpression",
         "AssignmentExpression",
-        "FunctionDeclaration",
         "GlobalVarStatement",
         "ReturnStatement",
         "BreakStatement",
@@ -100,12 +99,12 @@ function isAssignmentLikeExpression(nodeType) {
 }
 
 // these top-level statements are surrounded by empty lines by default
-function shouldAddNewlinesAroundStatement(node) {
+function shouldAddNewlinesAroundStatement(node, options) {
     const nodeType = node?.type;
     if (!nodeType) { return false; }
     if (
         [
-            "FunctionExpression",
+            "FunctionDeclaration",
             "ConstructorDeclaration",
         ].includes(nodeType)
     ) {

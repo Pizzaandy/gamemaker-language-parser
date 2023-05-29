@@ -133,7 +133,7 @@ varModifier
     ;
 
 variableDeclaration
-    : identifier (Assign expression)?
+    : identifier (Assign expressionOrFunction)?
     ;
 
 globalVarStatement
@@ -273,15 +273,23 @@ arrayLiteral
     ;
 
 elementList
-    : ','* expression? (','+ expression)* ','? // Yes, everything is optional
+    : ','* expressionOrFunction? (','+ expressionOrFunction)* ','? // Yes, everything is optional
     ;
 
 structLiteral
     : openBlock (propertyAssignment (',' propertyAssignment)* ','?)? closeBlock
     ;
 
+propertyAssignment
+    : propertyIdentifier ':' expressionOrFunction
+    ;
+
+propertyIdentifier
+    : Identifier | softKeyword | propertySoftKeyword
+    ;
+
 functionDeclaration
-    : Function_ Identifier? parameterList constructorClause? statement
+    : Function_ Identifier? parameterList constructorClause? block
     ;
 
 constructorClause
@@ -294,14 +302,6 @@ parameterList
 
 parameterArgument
     : identifier (Assign expressionOrFunction)?
-    ;
-
-propertyAssignment
-    : propertyIdentifier ':' expressionOrFunction
-    ;
-
-propertyIdentifier
-    : Identifier | softKeyword | propertySoftKeyword
     ;
 
 identifier

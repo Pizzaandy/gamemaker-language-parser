@@ -5,6 +5,8 @@ import clipboardy from 'clipboardy';
 const fp = 'test/large-files/SnowState.gml';
 let input = fs.readFileSync(fp, 'utf8');
 
+input = `function (/*foo*/):bar() /*baz*/ constructor {}`
+
 console.time("cold");
 GMLParser.parse(input, {getLocations: true});
 console.timeEnd("cold");

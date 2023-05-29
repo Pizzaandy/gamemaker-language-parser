@@ -1,15 +1,4 @@
-a()
-b()
-function d() { // comment
-// comment
-foo()
+function (/*foo*/):bar() /*baz*/ constructor {
+    a.bb().ccccccc().dddddd()
+    a.bbbbbbbbbbbbbbbbb().cccccccccccccccccccccc().ddddddddddddddddddddddddddddddddd()
 }
-
-
-function e() {}
-function f() {}
-
-
-
-c()
-d()

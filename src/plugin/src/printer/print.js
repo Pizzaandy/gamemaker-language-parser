@@ -19,12 +19,12 @@ const {
     concat,
     indentIfBreak,
     lineSuffixBoundary,
+    hardlineWithoutBreakParent
 } = builders;
 
 import {
     isLastStatement,
     optionalSemicolon,
-    isAssignmentLikeExpression,
     isNextLineEmpty,
     shouldAddNewlinesAroundStatement
 } from "./util.js";
@@ -169,7 +169,8 @@ export function print(path, options, print) {
         case "WithStatement": {
             return printSingleClauseStatement(path, options, print, "with", "test", "body");
         }
-        case "FunctionExpression": {
+        case "FunctionDeclaration":
+        case "ConstructorDeclaration": {
             const parts = [];
             parts.push(["function", node.id ? " " : "", print("id")]);
 
@@ -181,11 +182,33 @@ export function print(path, options, print) {
                     })
                 );
             } else {
-                parts.push([printEmptyParens(path, print, options)]);
+                parts.push(printEmptyParens(path, print, options));
             }
+
+            if (node.type == "ConstructorDeclaration") {
+                parts.push(print("parent"));
+            }
+
             parts.push(" ");
             parts.push(printInBlock(path, options, print, "body"));
             return parts;
+        }
+        case "ConstructorParentClause": {
+            let params;
+            if (node.params.length > 0) {
+                params = printDelimitedList(path, print, "params", "(", ")", {
+                    delimiter: ",",
+                    allowTrailingDelimiter: false,
+                });
+            } else {
+                params = printEmptyParens(path, print, options);
+            }
+            return [
+                " : ",
+                print("id"),
+                params,
+                " constructor"
+            ];
         }
         case "DefaultParameter": {
             return printSimpleDeclaration(print("left"), print("right"));
@@ -195,21 +218,24 @@ export function print(path, options, print) {
                 group(print("left")),
                 " ",
                 node.operator,
-                group(indent([line, print("right")])),
+                " ",
+                group(print("right")),
             ]);
         }
         case "GlobalVarStatement":
         case "VariableDeclaration": {
-            return [
-                node.kind,
-                " ",
-                printDelimitedList(path, print, "declarations", "", "", {
+            let decls = [];
+            if (node.declarations.length > 1) {
+                decls = printDelimitedList(path, print, "declarations", "", "", {
                     delimiter: ",",
                     allowTrailingDelimiter: false,
                     leadingNewline: false,
                     trailingNewline: false,
-                }),
-            ];
+                })
+            } else {
+                decls = path.map(print, "declarations");
+            }
+            return [node.kind, " ", decls];
         }
         case "VariableDeclarator": {
             return printSimpleDeclaration(print("id"), print("init"));
@@ -244,14 +270,12 @@ export function print(path, options, print) {
             }
         }
         case "MemberDotExpression": {
+            if (node.property)
             if (
                 path.parent?.type === "CallExpression" ||
                 node.type === "CallExpression"
             ) {
-                return [
-                    print("object"),
-                    group(indent([ifBreak(line), ".", print("property")])),
-                ];
+                return [print("object"), ifBreak(line), ".", print("property")];
             } else {
                 return [
                     print("object"),
@@ -286,8 +310,8 @@ export function print(path, options, print) {
                 delimiter: ",",
                 allowTrailingDelimiter: true,
                 forceBreak: node.hasTrailingComma,
-                // TODO: decide whether to add bracket spacing for struct expressions 
-                padding: "" 
+                // TODO: decide whether to add bracket spacing for struct expressions
+                padding: ""
             });
         }
         case "Property": {
@@ -374,7 +398,8 @@ function printDelimitedList(
         leadingNewline = true,
         trailingNewline = true,
         forceBreak = false,
-        padding = ""
+        padding = "",
+        groupId = undefined
     } = delimiterOptions
 ) {
     const lineBreak = forceBreak ? hardline : line;
@@ -389,7 +414,7 @@ function printDelimitedList(
         // always print a trailing delimiter if the list breaks
         ifBreak([finalDelimiter, trailingNewline ? lineBreak : ""], padding),
         endChar,
-    ]);
+    ], groupId);
 
     return printed;
 }
@@ -441,13 +466,19 @@ function printElements(path, print, listKey, delimiter, lineBreak) {
 
 // variation of printElements that handles semicolons and line breaks in a program or block
 function printStatements(path, options, print, childrenAttribute) {
+    let precedingBlankLineExists = true;
     return path.map((childPath, index) => {
         const parts = [];
         const node = childPath.getValue();
         const isTopLevel = childPath.parent?.type === "Program";
-
         const printed = print();
         const semi = optionalSemicolon(node.type);
+
+        const addNewlinePadding = shouldAddNewlinesAroundStatement(node, options) && isTopLevel;
+        if (addNewlinePadding && !precedingBlankLineExists) {
+            parts.push(hardline);
+        }
+        precedingBlankLineExists = false;
 
         if (docHasTrailingComment(printed)) {
             printed.splice(printed.length - 1, 0, semi);
@@ -461,6 +492,7 @@ function printStatements(path, options, print, childrenAttribute) {
             parts.push(hardline);
             if (isNextLineEmpty(options.originalText, node.end.index + 1)) {
                 parts.push(hardline);
+                precedingBlankLineExists = true;
             }
         } else if (isTopLevel) {
             parts.push(hardline);
@@ -514,9 +546,9 @@ function printEmptyParens(path, options, print) {
                 (comment) => !comment.attachToBrace
             )
         ]),
-        ifBreak(line),
+        ifBreak(line, "", {groupId: "emptyparen"}),
         ")"
-    ]);
+    ], {id: "emptyparen"});
     return printed;
 }
 

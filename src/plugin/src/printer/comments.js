@@ -228,8 +228,11 @@ function handleCommentInEmptyParens(
     }
 
     if (
-        comment.enclosingNode?.type === "FunctionExpression" &&
-        comment.enclosingNode?.params.length === 0
+        (
+            comment.enclosingNode?.type === "ConstructorParentClause" ||
+            comment.enclosingNode?.type === "FunctionDeclaration" ||
+            comment.enclosingNode?.type === "ConstructorDeclaration"
+        ) && comment.enclosingNode?.params.length === 0
     ) {
         addDanglingComment(comment.enclosingNode, comment);
         return true;
