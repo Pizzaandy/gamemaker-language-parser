@@ -990,9 +990,13 @@ export default class GameMakerASTBuilder extends GameMakerLanguageParserVisitor 
 
     // Visit a parse tree produced by GameMakerLanguageParser#constructorClause.
     visitConstructorClause(ctx) {
-        let id = ctx.Identifier().getText();
+        let id = null;
         let params = null;
         let hasTrailingComma = false;
+
+        if (ctx.Identifier() != null) {
+            id = ctx.Identifier().getText();
+        }
 
         if (ctx.parameterList() != null) {
             params = this.visit(ctx.parameterList());
