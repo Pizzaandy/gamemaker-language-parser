@@ -37,6 +37,10 @@ import {
 export function print(path, options, print) {
     const node = path.getValue();
 
+    if (!("inMemberChain" in options)) {
+        options.inMemberChain = false;
+    }
+
     if (!node) {
         return "";
     }
@@ -241,6 +245,10 @@ export function print(path, options, print) {
             return printSimpleDeclaration(print("id"), print("init"));
         }
         case "CallExpression": {
+            if (!options.inMemberChain) {
+                return printMemberChain(path, options, print);
+            }
+
             const parts = [print("object")];
             if (node.arguments.length === 0) {
                 parts.push(printEmptyParens(path, print, options));
@@ -270,12 +278,11 @@ export function print(path, options, print) {
             }
         }
         case "MemberDotExpression": {
-            if (node.property)
             if (
                 path.parent?.type === "CallExpression" ||
                 node.type === "CallExpression"
             ) {
-                return [print("object"), ifBreak(line), ".", print("property")];
+                return [print("object"), group(indent([ifBreak(hardlineWithoutBreakParent), ".", print("property")]))];
             } else {
                 return [
                     print("object"),
@@ -546,9 +553,9 @@ function printEmptyParens(path, options, print) {
                 (comment) => !comment.attachToBrace
             )
         ]),
-        ifBreak(line, "", {groupId: "emptyparen"}),
+        ifBreak(line, "", { groupId: "emptyparen" }),
         ")"
-    ], {id: "emptyparen"});
+    ], { id: "emptyparen" });
     return printed;
 }
 
@@ -576,4 +583,29 @@ function printEmptyBlock(path, options, print) {
     } else {
         return "{}";
     }
+}
+
+function printMemberChain(path, options, print) {
+    options.inMemberChain = true;
+    const printedNodes = [];
+
+    function rec(path) {
+        const { node } = path;
+        if (node.type === "CallExpression" || node.type === "MemberDotExpression") {
+            printedNodes.unshift(print(path, options));
+            path.call((object) => rec(object), "object");
+        } else {
+            printedNodes.unshift(print("path"));
+        }
+    }
+
+    printedNodes.unshift(path.getValue().type);
+
+    if (path.getValue().object) {
+        path.call((object) => rec(object), "object");
+    }
+
+    console.log(JSON.stringify(printedNodes));
+
+    options.inMemberChain = false;
 }
