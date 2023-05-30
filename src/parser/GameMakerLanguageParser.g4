@@ -179,9 +179,9 @@ expression
     | lValueExpression # VariableExpression
     | callStatement # CallExpression
 
-    | '-' expression # UnaryMinusExpression
-    | '~' expression # BitNotExpression
-    | Not expression # NotExpression
+    | <assoc=right> '-' expression # UnaryMinusExpression
+    | <assoc=right> '~' expression # BitNotExpression
+    | <assoc=right> Not expression # NotExpression
 
     | expression ('*' | '/' | Modulo | IntegerDivide) expression # MultiplicativeExpression
     | expression ('+' | '-') expression # AdditiveExpression
