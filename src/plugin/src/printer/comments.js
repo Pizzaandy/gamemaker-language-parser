@@ -219,6 +219,10 @@ function handleCommentInEmptyParens(
     ast,
     isLastComment
 ) {
+    if (comment.leadingChar != "(" || comment.trailingChar != ")") {
+        return false;
+    }
+
     if (
         comment.enclosingNode?.type === "CallExpression" &&
         comment.enclosingNode?.arguments.length === 0

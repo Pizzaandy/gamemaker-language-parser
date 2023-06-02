@@ -147,7 +147,6 @@ newExpression
 lValueStartExpression
     : identifier # IdentifierLValue
     | newExpression # NewLValue
-    | '(' lValueExpression ')' # ParenthesizedLValue
     ;
 
 lValueExpression

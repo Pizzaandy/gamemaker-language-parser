@@ -1,1 +1,1 @@
-x = a().b()
+x = foo.short().short2().long_name(argument).short().longer_name()

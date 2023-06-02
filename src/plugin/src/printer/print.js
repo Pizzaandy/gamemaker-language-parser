@@ -19,7 +19,6 @@ const {
     concat,
     indentIfBreak,
     lineSuffixBoundary,
-    hardlineWithoutBreakParent
 } = builders;
 
 import {
@@ -36,10 +35,6 @@ import {
 
 export function print(path, options, print) {
     const node = path.getValue();
-
-    if (!("inMemberChain" in options)) {
-        options.inMemberChain = false;
-    }
 
     if (!node) {
         return "";
@@ -245,29 +240,45 @@ export function print(path, options, print) {
             return printSimpleDeclaration(print("id"), print("init"));
         }
         case "CallExpression": {
-            if (!options.inMemberChain) {
-                return printMemberChain(path, options, print);
+            let printedArgs = [];
+
+            if (node.arguments.length === 0) {
+                printedArgs = printEmptyParens(path, print, options);
+            }
+            // else if (
+            //     node.arguments.length <= 2 &&
+            //     node.arguments.some((node) => node.type === "FunctionDeclaration")
+            // ) {
+            //     printedArgs = printDelimitedList(path, print, "arguments", "(", ")", {
+            //         delimiter: ",",
+            //         allowTrailingDelimiter: false,
+            //         leadingNewline: false,
+            //         trailingNewline: false,
+            //     });
+            //     console.log(JSON.stringify(printedArgs))
+            // }
+            else {
+                printedArgs = printDelimitedList(path, print, "arguments", "(", ")", {
+                    delimiter: ",",
+                    allowTrailingDelimiter: false,
+                });
             }
 
-            const parts = [print("object")];
-            if (node.arguments.length === 0) {
-                parts.push(printEmptyParens(path, print, options));
+            if (isInLValueChain(path)) {
+                return [print("object"), printedArgs];
             } else {
-                parts.push(
-                    printDelimitedList(path, print, "arguments", "(", ")", {
-                        delimiter: ",",
-                        allowTrailingDelimiter: false,
-                    })
-                )
+                return [
+                    group(indent(print("object"))),
+                    printedArgs
+                ];
             }
-            return parts;
         }
         case "BinaryExpression": {
             return group([
                 print("left"),
                 " ",
                 group([node.operator, line, print("right")])
-            ])
+            ]);
         }
         case "IncDecStatement":
         case "UnaryExpression": {
@@ -278,16 +289,29 @@ export function print(path, options, print) {
             }
         }
         case "MemberDotExpression": {
-            if (
-                path.parent?.type === "CallExpression" ||
-                node.type === "CallExpression"
-            ) {
-                return [print("object"), group(indent([ifBreak(hardlineWithoutBreakParent), ".", print("property")]))];
+            if (isInLValueChain(path)) {
+                if (path.parent?.type === "CallExpression") {
+                    // this dot expression is being called, so add a line break
+                    return [
+                        print("object"),
+                        softline, "*",
+                        ".",
+                        print("property"),
+                    ];
+                } else {
+                    return [
+                        print("object"),
+                        ".",
+                        print("property"),
+                    ];
+                }
             } else {
-                return [
-                    print("object"),
-                    group(indent([softline, ".", print("property")])),
+                const printed = [
+                    group(indent(print("object"))),
+                    ".",
+                    print("property")
                 ];
+                return printed;
             }
         }
         case "MemberIndexExpression": {
@@ -406,24 +430,26 @@ function printDelimitedList(
         trailingNewline = true,
         forceBreak = false,
         padding = "",
+        lineBreakOverride = null,
+        addIndent = true,
         groupId = undefined
     } = delimiterOptions
 ) {
-    const lineBreak = forceBreak ? hardline : line;
+    const lineBreak = forceBreak ? hardline : lineBreakOverride ?? line;
     const finalDelimiter = allowTrailingDelimiter ? delimiter : "";
 
-    const printed = group([
+    const innerDoc = [
+        ifBreak(leadingNewline ? lineBreak : "", padding),
+        printElements(path, print, listKey, delimiter, lineBreak),
+    ];
+
+    return group([
         startChar,
-        indent([
-            ifBreak(leadingNewline ? lineBreak : "", padding),
-            printElements(path, print, listKey, delimiter, lineBreak),
-        ]),
+        addIndent ? indent(innerDoc) : innerDoc,
         // always print a trailing delimiter if the list breaks
         ifBreak([finalDelimiter, trailingNewline ? lineBreak : ""], padding),
         endChar,
-    ], groupId);
-
-    return printed;
+    ], {groupId});
 }
 
 // wrap a statement in a block if it's not already a block
@@ -585,27 +611,21 @@ function printEmptyBlock(path, options, print) {
     }
 }
 
-function printMemberChain(path, options, print) {
-    options.inMemberChain = true;
-    const printedNodes = [];
-
-    function rec(path) {
-        const { node } = path;
-        if (node.type === "CallExpression" || node.type === "MemberDotExpression") {
-            printedNodes.unshift(print(path, options));
-            path.call((object) => rec(object), "object");
-        } else {
-            printedNodes.unshift(print("path"));
-        }
+function isInLValueChain(path) {
+    const { node, parent } = path;
+    if (
+        parent.type === "CallExpression" &&
+        parent.arguments.indexOf(node) !== -1
+    ) {
+        return false;
     }
+    return isLValueExpression(parent.type);
+}
 
-    printedNodes.unshift(path.getValue().type);
-
-    if (path.getValue().object) {
-        path.call((object) => rec(object), "object");
-    }
-
-    console.log(JSON.stringify(printedNodes));
-
-    options.inMemberChain = false;
+function isLValueExpression(nodeType) {
+    return (
+        nodeType === "MemberIndexExpression" ||
+        nodeType === "CallExpression" ||
+        nodeType === "MemberDotExpression"
+    );
 }

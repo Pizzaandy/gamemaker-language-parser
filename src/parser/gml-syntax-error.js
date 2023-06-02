@@ -18,7 +18,6 @@ export default class GameMakerParseErrorListener extends ErrorListener {
 
         const tokens = parser.getInputStream();
         const stack = parser.getRuleInvocationStack();
-
         const currentRule = stack[0];
 
         if (currentRule == "closeBlock") {
