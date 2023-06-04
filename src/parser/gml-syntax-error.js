@@ -59,6 +59,13 @@ export default class GameMakerParseErrorListener extends ErrorListener {
             );
         }
 
+        if (currentRule == "parameterList") {
+            throw (
+                `Syntax Error (line ${line}, column ${column}): ` +
+                `unexpected ${wrongSymbol} in function parameters, expected an identifier`
+            );
+        }
+
         const currentRuleFormatted = currentRule
             .replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
             .toLowerCase();

@@ -181,6 +181,7 @@ function handleCommentInEmptyBody(comment, text, options, ast, isLastComment) {
     return false;
 }
 
+// ignore macro comments because macros are printed exactly as-is
 function handleMacroComments(comment) {
     if (
         comment.enclosingNode?.type === "MacroDeclaration"

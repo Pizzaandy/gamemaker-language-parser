@@ -239,40 +239,6 @@ export function print(path, options, print) {
         case "VariableDeclarator": {
             return printSimpleDeclaration(print("id"), print("init"));
         }
-        case "CallExpression": {
-            let printedArgs = [];
-
-            if (node.arguments.length === 0) {
-                printedArgs = printEmptyParens(path, print, options);
-            }
-            // else if (
-            //     node.arguments.length <= 2 &&
-            //     node.arguments.some((node) => node.type === "FunctionDeclaration")
-            // ) {
-            //     printedArgs = printDelimitedList(path, print, "arguments", "(", ")", {
-            //         delimiter: ",",
-            //         allowTrailingDelimiter: false,
-            //         leadingNewline: false,
-            //         trailingNewline: false,
-            //     });
-            //     console.log(JSON.stringify(printedArgs))
-            // }
-            else {
-                printedArgs = printDelimitedList(path, print, "arguments", "(", ")", {
-                    delimiter: ",",
-                    allowTrailingDelimiter: false,
-                });
-            }
-
-            if (isInLValueChain(path)) {
-                return [print("object"), printedArgs];
-            } else {
-                return [
-                    group(indent(print("object"))),
-                    printedArgs
-                ];
-            }
-        }
         case "BinaryExpression": {
             return group([
                 print("left"),
@@ -288,13 +254,54 @@ export function print(path, options, print) {
                 return [print("argument"), node.operator];
             }
         }
+        case "CallExpression": {
+            let printedArgs = [];
+
+            if (node.arguments.length === 0) {
+                printedArgs = printEmptyParens(path, print, options);
+            } else if (
+                [node.arguments[0], node.arguments[node.arguments.length - 1]].some(
+                    (node) =>
+                        node.type === "FunctionDeclaration" ||
+                        node.type === "StructExpression"
+                )
+            ) {
+                // treat this function like it has a callback
+                let optionA = printDelimitedList(path, print, "arguments", "(", ")", {
+                    addIndent: false,
+                    forceInline: true,
+                    delimiter: ",",
+                    allowTrailingDelimiter: false,
+                    leadingNewline: false,
+                    trailingNewline: false,
+                });
+
+                let optionB = printDelimitedList(path, print, "arguments", "(", ")", {
+                    delimiter: ",",
+                    allowTrailingDelimiter: false,
+                });
+
+                printedArgs = conditionalGroup([optionA, optionB]);
+            } else {
+                printedArgs = printDelimitedList(path, print, "arguments", "(", ")", {
+                    delimiter: ",",
+                    allowTrailingDelimiter: false,
+                });
+            }
+
+            if (isInLValueChain(path)) {
+                return [print("object"), printedArgs];
+            } else {
+                return group([indent(print("object")), printedArgs]);
+            }
+        }
         case "MemberDotExpression": {
             if (isInLValueChain(path)) {
                 if (path.parent?.type === "CallExpression") {
-                    // this dot expression is being called, so add a line break
+                    // this dot expression is part of a call expression, so add a line break
                     return [
                         print("object"),
-                        softline, "*",
+                        softline,
                         ".",
                         print("property"),
                     ];
@@ -430,12 +437,12 @@ function printDelimitedList(
         trailingNewline = true,
         forceBreak = false,
         padding = "",
-        lineBreakOverride = null,
         addIndent = true,
-        groupId = undefined
+        groupId = undefined,
+        forceInline = false
     } = delimiterOptions
 ) {
-    const lineBreak = forceBreak ? hardline : lineBreakOverride ?? line;
+    const lineBreak = forceBreak ? hardline : line;
     const finalDelimiter = allowTrailingDelimiter ? delimiter : "";
 
     const innerDoc = [
@@ -443,13 +450,27 @@ function printDelimitedList(
         printElements(path, print, listKey, delimiter, lineBreak),
     ];
 
-    return group([
+    const groupElements = [
         startChar,
         addIndent ? indent(innerDoc) : innerDoc,
         // always print a trailing delimiter if the list breaks
         ifBreak([finalDelimiter, trailingNewline ? lineBreak : ""], padding),
         endChar,
-    ], {groupId});
+    ];
+
+    const groupElementsNoBreak = [
+        startChar,
+        padding,
+        printElements(path, print, listKey, delimiter, " "),
+        padding,
+        endChar,
+    ];
+
+    if (forceInline) {
+        return groupElementsNoBreak;
+    } else {
+        return group(groupElements, { groupId });
+    }
 }
 
 // wrap a statement in a block if it's not already a block
